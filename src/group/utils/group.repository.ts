@@ -27,7 +27,7 @@ export default class GroupRepository {
     return groupModel.findByIdAndUpdate(
       _id,
       { $set: partialGroup },
-      { runValidators: true, lean: true },
+      { runValidators: true, lean: true, new: true },
       ).exec();
   }
 
@@ -130,16 +130,12 @@ export default class GroupRepository {
    */
   static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole> {
     const group = await groupModel
-      .findOne({ _id: groupModel })
+      .findOne({ _id: groupID })
       .where('users')
       .elemMatch({ id: userID })
       .exec();
 
-    if (!group) {
-      throw new GroupNotFound(groupID);
-    }
-
-    if (!group.users) {
+    if (!group?.users) {
       throw new UserIsNotInGroup(userID, groupID);
     }
 

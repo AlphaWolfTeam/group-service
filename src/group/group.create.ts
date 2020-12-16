@@ -1,8 +1,10 @@
 import { Request, Response, Router } from 'express';
 import * as Joi from 'joi';
-import Endpoint, { HttpRequestType } from './group.endpoint';
+import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
 import { IGroup, GroupType } from './utils/group.interface';
 import GroupRepository from './utils/group.repository';
+import config from '../config';
+import { UserRole } from './user/user.role';
 
 export default class CreateGroup extends Endpoint {
 
@@ -17,23 +19,24 @@ export default class CreateGroup extends Endpoint {
         description: Joi.string().required(),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
-      header: {
-        'X-User-ID': Joi.string(),
+      headers: {
+        [config.userHeader]: Joi.string().required(),
       },
     });
   }
 
   async handler(req: Request, res: Response): Promise<void> {
+    const requesterID = getRequesterIdFromRequest(req);
     const group: IGroup = {
       name: req.body.name,
       description: req.body.description,
-      users: [],
-      type: req.body.type,
-      modifiedBy: req.body.requester,
-      createBy: req.body.requester,
+      users: [{ id: requesterID, role: UserRole.Admin }],
+      type: req.body.type || GroupType.Public,
+      modifiedBy: requesterID,
+      createdBy: requesterID,
     };
     const createdGroup: IGroup = await CreateGroup.logic(group);
-    res.sendStatus(201).json(createdGroup);
+    res.status(201).json(createdGroup);
   }
 
   /**

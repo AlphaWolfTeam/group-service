@@ -26,7 +26,7 @@ export default class AddUserToGroup extends Endpoint {
         id: Joi.string().custom(validateObjectID).required(),
         role: Joi.number().min(0).max(2),
       },
-      header: {
+      headers: {
         [config.userHeader]: Joi.string().required(),
       },
     });
@@ -39,7 +39,7 @@ export default class AddUserToGroup extends Endpoint {
     const userRole: UserRole = req.body['role'];
 
     const addedUser = await AddUserToGroup.logic(groupID, userToAdd, userRole, requesterID);
-    res.sendStatus(201).json(addedUser);
+    res.status(201).json(addedUser);
   }
 
   /**

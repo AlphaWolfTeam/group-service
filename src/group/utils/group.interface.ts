@@ -8,7 +8,7 @@ export interface IGroup {
   users: User[];
   modifiedBy: User['id'];
   exchangeAddress?: string;
-  createBy: User['id'];
+  createdBy: User['id'];
   createdAt?: Date;
   updatedAt?: Date;
 }

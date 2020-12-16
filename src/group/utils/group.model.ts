@@ -4,7 +4,6 @@ import { IGroup, GroupType } from './group.interface';
 
 const groupSchema = new Schema(
   {
-    _id: Types.ObjectId,
     name: {
       type: String,
       required: true,

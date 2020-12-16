@@ -4,7 +4,6 @@ import config from '../config';
 import { Router, Request, Response, NextFunction } from 'express';
 import ValidateRequest from '../utils/joi';
 import { wrapController } from '../utils/wrappers';
-import User from './user/user.interface';
 import { InvalidArgument } from '../utils/errors/client.error';
 
 export default abstract class Endpoint {
@@ -52,6 +51,12 @@ export enum HttpRequestType {
   DELETE = 'delete',
 }
 
+/**
+ * Extracts the requester ID from the user header of the express request.
+ * @param req - the express request.
+ * @returns the user ID that is in the request header.
+ * @throws InvalidArgument if the header is empty.
+ */
 export function getRequesterIdFromRequest(req: Request): string {
   const id = req.header(config.userHeader);
 

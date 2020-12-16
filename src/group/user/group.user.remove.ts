@@ -22,7 +22,7 @@ export default class RemoveUserFromGroup extends Endpoint {
         id: Joi.string().custom(validateObjectID).required(),
         userID: Joi.string().custom(validateObjectID).required(),
       },
-      header: {
+      headers: {
         [config.userHeader]: Joi.string().required(),
       },
     });

@@ -25,7 +25,7 @@ export default class UpdateUserRole extends Endpoint {
       body: {
         role: Joi.number().min(0).max(2).required(),
       },
-      header: {
+      headers: {
         [config.userHeader]: Joi.string().required(),
       },
     });
@@ -38,7 +38,7 @@ export default class UpdateUserRole extends Endpoint {
     const userRole: UserRole = req.body['role'];
 
     const addedUser = await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
-    res.sendStatus(200).json(addedUser);
+    res.status(200).json(addedUser);
   }
 
   /**

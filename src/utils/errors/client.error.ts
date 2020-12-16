@@ -25,13 +25,13 @@ export class GroupNotFound extends ResourceNotFound {
   }
 }
 
-export class UserIsNotInGroup extends ClientError {
+export class UserIsNotInGroup extends ResourceNotFound {
   constructor(userID: string, groupID: string) {
-    super(`The user ${userID} is not in the group ${groupID}`);
+    super(`The user ${userID} is not in the group ${groupID}. The group may not even exist.`);
   }
 }
 
-export class UserAlreadyExistsInGroup extends ResourceNotFound {
+export class UserAlreadyExistsInGroup extends ClientError {
   constructor(groupID: string, userID: string) {
     super(`The user ${userID} already exists in the group ${groupID}.`);
   }

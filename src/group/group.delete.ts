@@ -22,7 +22,7 @@ export default class DeleteGroup extends Endpoint {
       params: {
         id: Joi.string().custom(validateObjectID).required(),
       },
-      header: {
+      headers: {
         [config.userHeader]: Joi.string().required(),
       },
     });

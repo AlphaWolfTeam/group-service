@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
+import { pickBy } from 'lodash';
 
 import config from '../config';
 import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
@@ -29,7 +30,7 @@ export default class UpdateGroup extends Endpoint {
       params: {
         id: Joi.string().custom(validateObjectID).required(),
       },
-      header: {
+      headers: {
         [config.userHeader]: Joi.string().required(),
       },
     });
@@ -37,11 +38,18 @@ export default class UpdateGroup extends Endpoint {
 
   async handler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
-    const partialGroup: Partial<IGroup> = req.body.partialGroup;
+    let partialGroup: Partial<IGroup> = {
+      name: req.body.name,
+      description: req.body.description,
+      type: req.body.type,
+    };
+    // Take only the fields that are not undefined.
+    partialGroup = pickBy(partialGroup, v => v !== undefined);
+
     const requesterID = getRequesterIdFromRequest(req);
 
     const result = await UpdateGroup.logic(groupID, partialGroup, requesterID);
-    res.sendStatus(200).json(result);
+    res.status(200).json(result);
   }
 
   /**

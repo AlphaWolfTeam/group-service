@@ -10,7 +10,7 @@ import GroupRouter from './group/utils/group.router';
 import { ResourceNotFound } from './utils/errors/client.error';
 
 export default class Server {
-  private app: express.Application;
+  app: express.Application;
   private http: http.Server | undefined;
   private port: string;
 

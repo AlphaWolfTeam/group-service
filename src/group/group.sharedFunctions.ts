@@ -68,32 +68,14 @@ export default class GroupFunctions {
    * @param actionDescription - a short description of the action for logging purposes.
    */
   static async verifyUserCanPreformAction(groupID: string, userID: string, requiredRole: UserRole, actionDescription?: string): Promise<void> {
-    try {
-      const usersRole = await this.getUserRoleInGroup(groupID, userID);
-      if (!isRoleSufficient(requiredRole, usersRole)) {
-        const actionMessage = actionDescription ? ` when trying to ${actionDescription}.` : '.';
-        throw new UserCannotPreformActionOnGroup(
-          groupID,
-          userID,
-          `the user has a ${usersRole} role, but needs a ${requiredRole} role${actionMessage}`,
-         );
-      }
-    } catch (err) {
-      if (err instanceof GroupNotFound) {
-        throw new UserCannotPreformActionOnGroup(
-          groupID,
-          userID,
-          'the group does not exist',
-         );
-      } else if (err instanceof UserIsNotInGroup) {
-        throw new UserCannotPreformActionOnGroup(
-          groupID,
-          userID,
-          'the user is not in the group',
-         );
-      } else {
-        throw err;
-      }
+    const usersRole = await this.getUserRoleInGroup(groupID, userID);
+    if (!isRoleSufficient(requiredRole, usersRole)) {
+      const actionMessage = actionDescription ? ` when trying to ${actionDescription}.` : '.';
+      throw new UserCannotPreformActionOnGroup(
+        groupID,
+        userID,
+        `the user has a ${usersRole} role, but needs a ${requiredRole} role${actionMessage}`,
+        );
     }
   }
 
