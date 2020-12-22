@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
-import { IGroup } from './group.interface';
+import { IGroup, IGroupPrimal } from './group.interface';
 import { groupModel } from './group.model';
-import { GroupNotFound, UserIsNotInGroup } from '../../utils/errors/client.error';
+import { UserIsNotInGroup } from '../../utils/errors/client.error';
 import { UserRole } from '../user/user.role';
 
 /**
@@ -13,7 +13,7 @@ export default class GroupRepository {
    * Adds a given group to the DB.
    * @param group - is the group to be added to the DB
    */
-  static create(group: IGroup): Promise<IGroup> {
+  static create(group: IGroupPrimal): Promise<IGroup> {
     return groupModel.create(group);
   }
 
@@ -70,7 +70,7 @@ export default class GroupRepository {
   }
 
   /**
-   * Adds a user to a group.
+   * Adds a user to a group, only if he is not already in the group (by userID).
    * @param groupID - the groupID to add the user to.
    * @param userID  - the user ID to add to the group.
    * @param role    - the role of the user in the group.
@@ -78,7 +78,9 @@ export default class GroupRepository {
    * @returns - wether the group was modified successfully.
    */
   static async addUser(groupID: string, userID: string, role: UserRole): Promise<boolean> {
-    const res = await groupModel.updateOne({ _id: groupID }, { $push: { users: { role, id: userID } } }).exec();
+    const res = await groupModel.updateOne(
+      { _id: groupID, 'users.id': { $ne: userID } },
+      { $push: { users: { role, id: userID } } }).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
@@ -91,7 +93,7 @@ export default class GroupRepository {
    * @returns - wether the group was modified successfully.
    */
   static async updateUserRole(groupID: string, userID: string, role: UserRole): Promise<boolean> {
-    const res = await groupModel.updateOne({ _id: groupID, 'users.id': userID }, { $set: { 'users.$.role': UserRole } }).exec();
+    const res = await groupModel.updateOne({ _id: groupID, 'users.id': userID }, { $set: { 'users.$.role': role } }).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
@@ -129,10 +131,9 @@ export default class GroupRepository {
    * @returns the user's role in the group.
    */
   static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole> {
+
     const group = await groupModel
-      .findOne({ _id: groupID })
-      .where('users')
-      .elemMatch({ id: userID })
+      .findOne({ _id: groupID, 'users.id': userID }, { 'users.$': 1 })
       .exec();
 
     if (!group?.users) {

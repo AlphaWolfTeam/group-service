@@ -21,12 +21,15 @@ export function isRoleSufficient(sufficientRole: UserRole, role: UserRole): bool
   return role >= sufficientRole;
 }
 
+/**
+ * A map of required user roles on groups by action.
+ */
 export const requiredRole = {
   delete: UserRole.Admin,
-  update: UserRole.Admin,
+  update: UserRole.Modifier,
   user: {
     add: (role: UserRole) => {
-      if (role >= UserRole.Modifier) {
+      if (role <= UserRole.Modifier) {
         return UserRole.Modifier;
       }
       return role;

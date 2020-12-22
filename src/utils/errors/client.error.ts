@@ -33,7 +33,13 @@ export class UserIsNotInGroup extends ResourceNotFound {
 
 export class UserAlreadyExistsInGroup extends ClientError {
   constructor(groupID: string, userID: string) {
-    super(`The user ${userID} already exists in the group ${groupID}.`);
+    super(`The user ${userID} already exists in the group ${groupID}.`, 409);
+  }
+}
+
+export class CannotAccessGroup extends ClientError {
+  constructor(groupID?: string, userID?: string) {
+    super(`The user ${userID} cannot get details on private group ${groupID} that he is not in.`, 403);
   }
 }
 
@@ -44,5 +50,25 @@ export class UserCannotPreformActionOnGroup extends ClientError {
       message += ` because: ${reason}`;
     }
     super(message, 403);
+  }
+}
+
+/**
+ * UniqueIndexExistsError is a type of a ClientError, where @code will
+ * always be `CONFLICT`. The default error message will include the unique
+ * index fields and value in it's metadata.
+ */
+export class UniqueIndexExistsError extends ClientError {
+  /**
+   * The constructor of UniqueIndexExistsError.
+   * @param uniqueIndexFields list of the unique indexes fields that failed the action.
+   * @param uniqueIndexValues list of the unique indexes value that already exists.
+   * @param message A custom message
+   */
+  constructor(uniqueIndexFields: string, uniqueIndexValues: string, message?: string) {
+    super(
+      message || `unique index duplicate error: The unique index <${uniqueIndexFields}> already has the keys: ${uniqueIndexValues}`,
+      409,
+    );
   }
 }

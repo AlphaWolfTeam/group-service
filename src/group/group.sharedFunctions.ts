@@ -75,7 +75,7 @@ export default class GroupFunctions {
         groupID,
         userID,
         `the user has a ${usersRole} role, but needs a ${requiredRole} role${actionMessage}`,
-        );
+      );
     }
   }
 

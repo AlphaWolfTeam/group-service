@@ -1,5 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
-import { UserRole } from '../user/user.role';
+import { Schema, model, Document } from 'mongoose';
 import { IGroup, GroupType } from './group.interface';
 
 const groupSchema = new Schema(
@@ -18,8 +17,9 @@ const groupSchema = new Schema(
     },
     users: {
       type: [{
-        id: Schema.Types.ObjectId,
-        role: String,
+        _id : false,
+        id: { type: String, index: true },
+        role: Number,
       }],
       default: [],
     },
@@ -41,7 +41,5 @@ const groupSchema = new Schema(
     timestamps: true,
   },
 );
-
-groupSchema.index({ _id: 1, 'users.id': 1 }, { unique: true });
 
 export const groupModel = model<IGroup & Document>('Group', groupSchema);

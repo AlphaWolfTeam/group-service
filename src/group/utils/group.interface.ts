@@ -1,14 +1,23 @@
 import User from '../user/user.interface';
 
-export interface IGroup {
-  id?: string;
+export interface IGroupPrimal {
   name: string;
   description: string;
   type: GroupType;
   users: User[];
   modifiedBy: User['id'];
-  exchangeAddress?: string;
   createdBy: User['id'];
+}
+
+export interface IGroup {
+  _id: string;
+  name: string;
+  description: string;
+  type: GroupType;
+  users: User[];
+  modifiedBy: User['id'];
+  createdBy: User['id'];
+  exchangeAddress?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

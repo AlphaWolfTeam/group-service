@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import * as Joi from 'joi';
 import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
-import { IGroup, GroupType } from './utils/group.interface';
+import { IGroup, GroupType, IGroupPrimal } from './utils/group.interface';
 import GroupRepository from './utils/group.repository';
 import config from '../config';
 import { UserRole } from './user/user.role';
@@ -27,7 +27,7 @@ export default class CreateGroup extends Endpoint {
 
   async handler(req: Request, res: Response): Promise<void> {
     const requesterID = getRequesterIdFromRequest(req);
-    const group: IGroup = {
+    const group: IGroupPrimal = {
       name: req.body.name,
       description: req.body.description,
       users: [{ id: requesterID, role: UserRole.Admin }],
@@ -35,7 +35,7 @@ export default class CreateGroup extends Endpoint {
       modifiedBy: requesterID,
       createdBy: requesterID,
     };
-    const createdGroup: IGroup = await CreateGroup.logic(group);
+    const createdGroup: IGroupPrimal = await CreateGroup.logic(group);
     res.status(201).json(createdGroup);
   }
 
@@ -44,7 +44,7 @@ export default class CreateGroup extends Endpoint {
    * @param group - the group to add to the DB
    * @returns the new created group.
    */
-  static async logic(group: IGroup): Promise<IGroup> {
+  static async logic(group: IGroupPrimal): Promise<IGroup> {
     const createdGroup: IGroup = await GroupRepository.create(group);
     return createdGroup;
   }

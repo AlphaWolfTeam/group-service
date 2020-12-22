@@ -13,9 +13,11 @@ export default class Server {
   app: express.Application;
   private http: http.Server | undefined;
   private port: string;
+  private env: string;
 
-  constructor(port: string) {
+  constructor(port: string, env:string = 'prod') {
     this.port = port;
+    this.env = env;
     this.app = express();
 
     this.configureMiddleware();
@@ -24,7 +26,9 @@ export default class Server {
   }
 
   private configureMiddleware() {
-    this.app.use(logger('tiny'));
+    if (this.env !== 'test') {
+      this.app.use(logger('tiny'));
+    }
     this.app.use(helmet());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));

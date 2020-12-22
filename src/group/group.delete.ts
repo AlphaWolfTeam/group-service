@@ -34,7 +34,7 @@ export default class DeleteGroup extends Endpoint {
 
     const result = await DeleteGroup.logic(groupID, requesterID);
     if (!result) throw new ServerError('Internal error: Group update failed');
-    res.sendStatus(200);
+    res.status(200).json(result._id);
   }
 
   /**

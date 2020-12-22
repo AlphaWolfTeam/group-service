@@ -33,8 +33,8 @@ export default class RemoveUserFromGroup extends Endpoint {
     const requesterID = getRequesterIdFromRequest(req);
     const userToAdd: string = req.params['userID'];
 
-    await RemoveUserFromGroup.logic(groupID, userToAdd, requesterID);
-    res.sendStatus(204);
+    const deletedUserID = await RemoveUserFromGroup.logic(groupID, userToAdd, requesterID);
+    res.status(200).json(deletedUserID);
   }
 
   /**
@@ -51,19 +51,24 @@ export default class RemoveUserFromGroup extends Endpoint {
   static async logic(
     groupID: string,
     userID: string,
-    requesterID: string): Promise<void> {
+    requesterID: string): Promise<string> {
 
     const userRole = await GroupFunctions.getUserRoleInGroup(groupID, userID);
-    await GroupFunctions.verifyUserCanPreformAction(
-      groupID,
-      requesterID,
-      requiredRole.user.delete(userRole),
-      `delete the user ${userID} with the role ${UserRole[userRole]} from the group ${groupID}.`,
-    );
+
+    // A user can remove himself from a group regardless of his role in the group.
+    if (userID !== requesterID) {
+      await GroupFunctions.verifyUserCanPreformAction(
+        groupID,
+        requesterID,
+        requiredRole.user.delete(userRole),
+        `delete the user ${userID} with the role ${UserRole[userRole]} from the group ${groupID}.`,
+        );
+    }
 
     const res = await GroupRepository.removeUser(groupID, userID);
     if (!res) {
       throw new Unexpected(`Unexpected error when deleting user ${userID} with role ${userRole} from the group ${groupID}`);
     }
+    return userID;
   }
 }

@@ -1,21 +1,24 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import Endpoint, { HttpRequestType } from '../group.endpoint';
-import { GroupNotFound } from '../../utils/errors/client.error';
-import GroupFunctions from '../group.sharedFunctions';
 import { validateObjectID } from '../../utils/joi';
 import User from './user.interface';
+import GetGroupByID from '../group.getByID';
+import config from '../../config';
 
 export default class GetUsersOfGroup extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.GET, '/:id');
+    super(HttpRequestType.GET, '/:id/users');
   }
 
   createRequestSchema(): Joi.ObjectSchema {
     return Joi.object({
       params: {
         id: Joi.string().custom(validateObjectID),
+      },
+      headers: {
+        [config.userHeader]: Joi.string(),
       },
     });
   }
@@ -26,9 +29,8 @@ export default class GetUsersOfGroup extends Endpoint {
     res.json(users);
   }
 
-  static async logic(id: string): Promise<User[]>  {
-    const group = await GroupFunctions.findGroupByID(id);
-    if (!group) throw new GroupNotFound(id);
+  static async logic(id: string, requesterID?: string): Promise<User[]>  {
+    const group = await GetGroupByID.logic(id, requesterID);
     return group.users;
   }
 

@@ -66,7 +66,7 @@ export default class AddUserToGroup extends Endpoint {
       `add a user to the group ${groupID}.`,
     );
 
-    if (GroupFunctions.isUserInGroup(groupID, userID)) {
+    if (await GroupFunctions.isUserInGroup(groupID, userID)) {
       throw new UserAlreadyExistsInGroup(groupID, userID);
     }
 
