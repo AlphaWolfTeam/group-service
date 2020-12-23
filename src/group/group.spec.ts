@@ -240,7 +240,7 @@ describe('Group Service', () => {
       expect(res.status).toEqual(404);
     });
 
-    test('should return NotFound error if the user is not in the group', async () => {
+    test('should return Forbidden error if the requester is not in the group', async () => {
       const group = await createGroupHelper();
 
       const partialGroup: Partial<IGroup> = {
@@ -254,7 +254,7 @@ describe('Group Service', () => {
         .send(partialGroup)
         .set({ [config.userHeader]: USER_2_ID });
 
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(403);
     });
 
     test('should return a Forbidden error when user does not have required permission to group ', async () => {
@@ -361,22 +361,22 @@ describe('Group Service', () => {
         .toThrow(GroupNotFound);
     });
 
-    test('should return a Not Found error if requesting to delete a file which does not exist', async () => {
+    test('should return a NotFound error if requesting to delete a file which does not exist', async () => {
       const res = await request(app)
         .delete(`/${GROUP_ID}`)
         .set({ [config.userHeader]: USER_ID });
       expect(res.status).toEqual(404);
     });
 
-    test('should return a Not Found error if the requester is not in the group', async () => {
+    test('should return a Forbidden error if the requester is not in the group', async () => {
       const group = await createGroupHelper({ userID: USER_ID  });
       const res = await request(app)
         .delete(`/${group._id}`)
         .set({ [config.userHeader]: USER_2_ID });
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(403);
     });
 
-    test('should return a Validation error if no requestor sent', async () => {
+    test('should return a Validation error if no requester sent', async () => {
       const group = await createGroupHelper({ userID: USER_ID  });
       const res = await request(app)
         .delete(`/${group._id}`);
@@ -388,7 +388,7 @@ describe('Group Service', () => {
       const res = await request(app)
         .delete(`/${group._id}`)
         .set({ [config.userHeader]: USER_2_ID });
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(403);
     });
   });
 
@@ -458,7 +458,7 @@ describe('Group Service', () => {
       expect(user).toHaveProperty('id', USER_2_ID);
       expect(user).toHaveProperty('role', UserRole.Member);
 
-      const updatedGroup = await GroupFunctions.findGroupByID(group._id);
+      const updatedGroup = await GroupFunctions.getGroupByID(group._id);
       expect(updatedGroup).toHaveProperty('users');
       expect(updatedGroup?.users).toHaveLength(2);
       expect(updatedGroup?.users[0]).toHaveProperty('id', USER_ID);
@@ -558,7 +558,7 @@ describe('Group Service', () => {
       expect(res.status).toEqual(400);
     });
 
-    test('should return NotFound error if the requestor is not in the group', async () => {
+    test('should return Forbidden error if the requester is not in the group', async () => {
       const group = await createGroupHelper({ userID: USER_ID });
       await addUserToGroupHelper(group._id, USER_2_ID, UserRole.Modifier);
 
@@ -567,7 +567,7 @@ describe('Group Service', () => {
         .send({ role: UserRole.Admin })
         .set({ [config.userHeader]: USER_3_ID });
 
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(403);
     });
 
     test('should return NotFound error if the user is not in the group', async () => {
@@ -683,7 +683,7 @@ describe('Group Service', () => {
       expect(res.status).toEqual(404);
     });
 
-    test('should return NotFound error if the requestor is not in the group', async () => {
+    test('should return Forbidden error if the requester is not in the group', async () => {
       const group = await createGroupHelper({ userID: USER_ID });
       await addUserToGroupHelper(group._id, USER_2_ID, UserRole.Modifier);
 
@@ -691,7 +691,7 @@ describe('Group Service', () => {
         .delete(`/${group._id}/users/${USER_2_ID}`)
         .set({ [config.userHeader]: USER_3_ID });
 
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(403);
     });
 
     test('should return NotFound error if the user is not in the group', async () => {

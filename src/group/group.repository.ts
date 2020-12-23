@@ -122,22 +122,21 @@ export default class GroupRepository {
   }
 
    /**
-   * Gets a users role in a group.
-   * The function throws an error when:
-   * - The user is not in the group
-   * - The group does not even exist
+   * Return a user's role in a group.
    * @param groupID - the ID of the group.
    * @param userID - the ID of the user.
-   * @returns the user's role in the group.
+   * @returns the user's role in the group, or null in the following cases:
+   * - The user is not in the group
+   * - The group does not even exist
    */
-  static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole> {
+  static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole | null> {
 
     const group = await groupModel
       .findOne({ _id: groupID, 'users.id': userID }, { 'users.$': 1 })
       .exec();
 
     if (!group?.users) {
-      throw new UserIsNotInGroup(userID, groupID);
+      return null;
     }
 
     return group.users[0].role;

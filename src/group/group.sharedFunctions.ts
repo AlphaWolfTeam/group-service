@@ -6,20 +6,11 @@ import { UserRole, isRoleSufficient } from './user/user.role';
 export default class GroupFunctions {
 
   /**
-   * verifies that a group exists. If not throws an error.
-   * @param groupID - the group's ID.
-   */
-  static async verifyGroupExists(groupID: string) {
-    const group = await this.findGroupByID(groupID);
-    if (!group) throw new GroupNotFound(groupID);
-  }
-
-  /**
    * getGroupByID finds a group by its ID.
    * @param id - a group ID.
    * @returns a Group object or null if the group is not found.
    */
-  static async findGroupByID(id: string): Promise<IGroup | null>  {
+  static async getGroupByID(id: string): Promise<IGroup | null>  {
     return await GroupRepository.getById(id);
   }
 
@@ -32,28 +23,19 @@ export default class GroupFunctions {
    * @param userID - the ID of the user.
    * @returns the user's role in the group.
    */
-  static async getUserRoleInGroup(groupID: string, userID: string): Promise<UserRole> {
-    const role: UserRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
-    return role;
+  static async getUserRoleInGroup(groupID: string, userID: string): Promise<UserRole | null> {
+    return await GroupRepository.getUserRoleFromGroup(groupID, userID);
   }
 
   /**
    * Checks if a user is in a group.
-   * Throws an error if the group does not exist.
    * @param groupID - the ID of the group.
    * @param userID - the ID of the user.
    * @returns whether the user is in the group.
    */
   static async isUserInGroup(groupID: string, userID: string): Promise<boolean> {
-    try {
-      await GroupRepository.getUserRoleFromGroup(groupID, userID);
-    } catch (err) {
-      if (err instanceof UserIsNotInGroup) {
-        return false;
-      }
-      throw err;
-    }
-    return true;
+    const role = await this.getUserRoleInGroup(groupID, userID);
+    return (role !== null);
   }
 
   /**
@@ -69,6 +51,14 @@ export default class GroupFunctions {
    */
   static async verifyUserCanPreformAction(groupID: string, userID: string, requiredRole: UserRole, actionDescription?: string): Promise<void> {
     const usersRole = await this.getUserRoleInGroup(groupID, userID);
+
+    if(usersRole === null) {
+      const group: IGroup | null = await this.getGroupByID(groupID);
+      if(!group) {
+        throw new GroupNotFound(groupID);
+      }
+      throw new UserCannotPreformActionOnGroup(groupID, userID, 'the user is not in the group');
+    }
     if (!isRoleSufficient(requiredRole, usersRole)) {
       const actionMessage = actionDescription ? ` when trying to ${actionDescription}.` : '.';
       throw new UserCannotPreformActionOnGroup(

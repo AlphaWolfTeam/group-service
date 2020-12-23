@@ -9,6 +9,7 @@ import User from '../user.interface';
 import { UserRole, requiredRole } from '../user.role';
 import GroupRepository from '../../group.repository';
 import { Unexpected } from '../../../utils/errors/server.error';
+import { UserIsNotInGroup } from '../../../utils/errors/client.error';
 
 export default class UpdateUserRole extends Endpoint {
 
@@ -59,6 +60,9 @@ export default class UpdateUserRole extends Endpoint {
     requesterID: string): Promise<User> {
 
     const oldRole = await GroupFunctions.getUserRoleInGroup(groupID, userID);
+    if(oldRole === null) {
+      throw new UserIsNotInGroup(userID, groupID);
+    }
     await GroupFunctions.verifyUserCanPreformAction(
       groupID,
       requesterID,

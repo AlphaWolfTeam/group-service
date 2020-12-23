@@ -9,6 +9,7 @@ import User from '../user.interface';
 import { UserRole, requiredRole } from '../user.role';
 import GroupRepository from '../../group.repository';
 import { Unexpected } from '../../../utils/errors/server.error';
+import { UserIsNotInGroup } from '../../../utils/errors/client.error';
 
 export default class RemoveUserFromGroup extends Endpoint {
 
@@ -54,7 +55,9 @@ export default class RemoveUserFromGroup extends Endpoint {
     requesterID: string): Promise<string> {
 
     const userRole = await GroupFunctions.getUserRoleInGroup(groupID, userID);
-
+    if(userRole === null) {
+      throw new UserIsNotInGroup(userID, groupID);
+    }
     // A user can remove himself from a group regardless of his role in the group.
     if (userID !== requesterID) {
       await GroupFunctions.verifyUserCanPreformAction(
