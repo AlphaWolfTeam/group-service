@@ -32,6 +32,10 @@ describe('Group Service', () => {
     await Promise.all(removeCollectionPromises);
   });
 
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
+
   describe('Get Group By ID', () => {
     test('should throw a validation error if the id sent is not an objectID', async () => {
       const res = await request(app).get(`/${123}`);
