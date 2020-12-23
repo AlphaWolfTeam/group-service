@@ -1,8 +1,8 @@
 import { ObjectID } from 'mongodb';
 import { IGroup, IGroupPrimal } from './group.interface';
 import { groupModel } from './group.model';
-import { UserIsNotInGroup } from '../../utils/errors/client.error';
-import { UserRole } from '../user/user.role';
+import { UserIsNotInGroup } from '../utils/errors/client.error';
+import { UserRole } from './user/user.role';
 
 /**
  * The repository connects the group-service with the mongo DB.

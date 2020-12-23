@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
-import Endpoint, { HttpRequestType } from '../group.endpoint';
-import { validateObjectID } from '../../utils/joi';
-import User from './user.interface';
-import GetGroupByID from '../group.getByID';
-import config from '../../config';
+import Endpoint, { HttpRequestType } from '../../endpoints/group.endpoint';
+import { validateObjectID } from '../../../utils/joi';
+import User from '../user.interface';
+import GetGroupByID from '../../endpoints/group.getByID';
+import config from '../../../config';
 
 export default class GetUsersOfGroup extends Endpoint {
 

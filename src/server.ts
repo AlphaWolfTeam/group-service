@@ -6,7 +6,7 @@ import * as logger from 'morgan';
 
 import { once } from 'events';
 import errorMiddleware from './utils/errors/error.middleware';
-import GroupRouter from './group/utils/group.router';
+import GroupRouter from './group/group.router';
 import { ResourceNotFound } from './utils/errors/client.error';
 
 export default class Server {

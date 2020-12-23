@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
-import { IGroup, GroupType } from './utils/group.interface';
-import { GroupNotFound, CannotAccessGroup } from '../utils/errors/client.error';
-import GroupFunctions from './group.sharedFunctions';
-import { validateObjectID } from '../utils/joi';
-import config from '../config';
+import Endpoint, { HttpRequestType } from './group.endpoint';
+import { IGroup, GroupType } from '../group.interface';
+import { GroupNotFound, CannotAccessGroup } from '../../utils/errors/client.error';
+import GroupFunctions from '../group.sharedFunctions';
+import { validateObjectID } from '../../utils/joi';
+import config from '../../config';
 
 export default class GetGroupByID extends Endpoint {
 

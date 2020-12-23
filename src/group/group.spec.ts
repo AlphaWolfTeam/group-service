@@ -1,15 +1,14 @@
 import * as request from 'supertest';
-import Server from '../../server';
+import Server from '../server';
 import * as mongoose from 'mongoose';
-import config from '../../config';
-import CreateGroup from '../group.create';
+import config from '../config';
+import CreateGroup from './endpoints/group.create';
 import { IGroup, GroupType, IGroupPrimal } from './group.interface';
-import { UserRole } from '../user/user.role';
-import GetGroupByID from '../group.getByID';
-import { GroupNotFound } from '../../utils/errors/client.error';
+import { UserRole } from './user/user.role';
+import GetGroupByID from './endpoints/group.getByID';
+import { GroupNotFound } from '../utils/errors/client.error';
 import GroupRepository from './group.repository';
-import expectCt from 'helmet/dist/middlewares/expect-ct';
-import GroupFunctions from '../group.sharedFunctions';
+import GroupFunctions from './group.sharedFunctions';
 
 const GROUP_ID = mongoose.Types.ObjectId().toHexString();
 const USER_ID = mongoose.Types.ObjectId().toHexString();

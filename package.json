@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run tslint && npm run build-ts",
     "build-ts": "tsc",
+    "coverage": "jest --collect-coverage",
     "dev": "ts-node src/index.ts",
     "serve": "node dist/index.js",
     "start": "npm run build && npm run serve",

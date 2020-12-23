@@ -1,10 +1,10 @@
 import * as Joi from 'joi';
 
-import config from '../config';
+import config from '../../config';
 import { Router, Request, Response, NextFunction } from 'express';
-import ValidateRequest from '../utils/joi';
-import { wrapController } from '../utils/wrappers';
-import { InvalidArgument } from '../utils/errors/client.error';
+import ValidateRequest from '../../utils/joi';
+import { wrapController } from '../../utils/wrappers';
+import { InvalidArgument } from '../../utils/errors/client.error';
 
 export default abstract class Endpoint {
 

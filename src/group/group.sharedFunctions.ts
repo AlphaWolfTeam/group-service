@@ -1,6 +1,6 @@
 import { GroupNotFound, UserCannotPreformActionOnGroup, UserIsNotInGroup } from '../utils/errors/client.error';
-import GroupRepository from './utils/group.repository';
-import { IGroup } from './utils/group.interface';
+import GroupRepository from './group.repository';
+import { IGroup } from './group.interface';
 import { UserRole, isRoleSufficient } from './user/user.role';
 
 export default class GroupFunctions {

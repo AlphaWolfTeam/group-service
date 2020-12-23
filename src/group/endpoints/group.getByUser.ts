@@ -1,8 +1,8 @@
 import { Request, Response, Router } from 'express';
 import * as Joi from 'joi';
 import Endpoint, { HttpRequestType } from './group.endpoint';
-import { IGroup } from './utils/group.interface';
-import GroupRepository from './utils/group.repository';
+import { IGroup } from '../group.interface';
+import GroupRepository from '../group.repository';
 
 export default class GetGroupByUserID extends Endpoint {
 

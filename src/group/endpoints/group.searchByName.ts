@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import Endpoint, { HttpRequestType } from './group.endpoint';
-import { IGroup } from './utils/group.interface';
-import GroupRepository from './utils/group.repository';
-import { InvalidArgument } from '../utils/errors/client.error';
+import { IGroup } from '../group.interface';
+import GroupRepository from '../group.repository';
+import { InvalidArgument } from '../../utils/errors/client.error';
 
 export default class SearchGroupByName extends Endpoint {
 

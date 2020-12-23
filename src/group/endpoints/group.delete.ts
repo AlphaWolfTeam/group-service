@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 
-import config from '../config';
+import config from '../../config';
 import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
-import { IGroup } from './utils/group.interface';
-import GroupRepository from './utils/group.repository';
-import GroupFunctions from './group.sharedFunctions';
-import { ServerError } from '../utils/errors/application.error';
-import { requiredRole } from './user/user.role';
-import User from './user/user.interface';
-import { validateObjectID } from '../utils/joi';
+import { IGroup } from '../group.interface';
+import GroupRepository from '../group.repository';
+import GroupFunctions from '../group.sharedFunctions';
+import { ServerError } from '../../utils/errors/application.error';
+import { requiredRole } from '../user/user.role';
+import User from '../user/user.interface';
+import { validateObjectID } from '../../utils/joi';
 
 export default class DeleteGroup extends Endpoint {
 

@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 
-import config from '../../config';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from '../group.endpoint';
-import { UserAlreadyExistsInGroup } from '../../utils/errors/client.error';
-import GroupFunctions from '../group.sharedFunctions';
-import { validateObjectID } from '../../utils/joi';
-import User from './user.interface';
-import { UserRole, requiredRole } from './user.role';
-import GroupRepository from '../utils/group.repository';
-import { Unexpected } from '../../utils/errors/server.error';
+import config from '../../../config';
+import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from '../../endpoints/group.endpoint';
+import { UserAlreadyExistsInGroup } from '../../../utils/errors/client.error';
+import GroupFunctions from '../../group.sharedFunctions';
+import { validateObjectID } from '../../../utils/joi';
+import User from '../user.interface';
+import { UserRole, requiredRole } from '../user.role';
+import GroupRepository from '../../group.repository';
+import { Unexpected } from '../../../utils/errors/server.error';
 
 export default class AddUserToGroup extends Endpoint {
 
