@@ -121,14 +121,15 @@ describe('Group Service', () => {
     test('should return the groups that match the partialName', async() => {
       const group1 = await createGroupHelper({ name: 'fox' });
       const group2 = await createGroupHelper({ name: 'firefox' });
-      const group3 = await createGroupHelper({ name: 'fox-news' });
-      const group4 = await createGroupHelper({ name: 'proxy' });
+      const group3 = await createGroupHelper({ name: 'FireFox' });
+      const group4 = await createGroupHelper({ name: 'fox-news' });
+      const group5 = await createGroupHelper({ name: 'proxy' });
 
       const res = await request(app).get('/').query({ partialName: 'fox' });
       expect(res.status).toEqual(200);
 
       const groups: IGroup[] = res.body;
-      expect(groups).toHaveLength(3);
+      expect(groups).toHaveLength(4);
 
     });
   });
@@ -354,9 +355,8 @@ describe('Group Service', () => {
         .set({ [config.userHeader]: USER_ID });
 
       expect(res.status).toEqual(200);
-      const deletedID: string = res.body.id;
 
-      await expect(GetGroupByID.logic(deletedID))
+      await expect(GetGroupByID.logic(group._id))
         .rejects
         .toThrow(GroupNotFound);
     });
@@ -453,12 +453,9 @@ describe('Group Service', () => {
         .send({ id: USER_2_ID })
         .set({ [config.userHeader]: USER_ID });
 
-      expect(res.status).toEqual(201);
-      const user = res.body;
-      expect(user).toHaveProperty('id', USER_2_ID);
-      expect(user).toHaveProperty('role', UserRole.Member);
+      expect(res.status).toEqual(204);
 
-      const updatedGroup = await GroupFunctions.getGroupByID(group._id);
+      const updatedGroup = await GroupRepository.getById(group._id);
       expect(updatedGroup).toHaveProperty('users');
       expect(updatedGroup?.users).toHaveLength(2);
       expect(updatedGroup?.users[0]).toHaveProperty('id', USER_ID);
@@ -510,6 +507,26 @@ describe('Group Service', () => {
 
       expect(res.status).toEqual(403);
     });
+
+    test('should be able to add a specific users to different groups', async () => {
+      const group1 = await createGroupHelper({ userID: USER_ID });
+
+      let res = await request(app)
+        .post('/')
+        .send({ name: 'group', description: 'a group' })
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(201);
+      const group2 = res.body;
+
+      await addUserToGroupHelper(group1._id, USER_2_ID, UserRole.Modifier);
+      res = await request(app)
+        .post(`/${group2._id}/users`)
+        .send({ id: USER_2_ID, role: UserRole.Admin })
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(204);
+    });
   });
 
   describe('Update user role in group', () => {
@@ -522,20 +539,14 @@ describe('Group Service', () => {
         .send({ role: UserRole.Admin })
         .set({ [config.userHeader]: USER_ID });
 
-      expect(res.status).toEqual(200);
-
-      expect(res.body).toHaveProperty('id', USER_2_ID);
-      expect(res.body).toHaveProperty('role', UserRole.Admin);
+      expect(res.status).toEqual(204);
 
       res = await request(app)
         .put(`/${group._id}/users/${USER_2_ID}`)
         .send({ role: UserRole.Member })
         .set({ [config.userHeader]: USER_ID });
 
-      expect(res.status).toEqual(200);
-
-      expect(res.body).toHaveProperty('id', USER_2_ID);
-      expect(res.body).toHaveProperty('role', UserRole.Member);
+      expect(res.status).toEqual(204);
     });
 
     test('should return NotFound error if the group does not exist', async () => {

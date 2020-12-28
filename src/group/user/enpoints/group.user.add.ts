@@ -32,14 +32,14 @@ export default class AddUserToGroup extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
     const userToAdd: string = req.body['id'];
     const userRole: UserRole = req.body['role'];
 
     const addedUser = await AddUserToGroup.logic(groupID, userToAdd, userRole, requesterID);
-    res.status(201).json(addedUser);
+    res.sendStatus(204);
   }
 
   /**
@@ -57,9 +57,9 @@ export default class AddUserToGroup extends Endpoint {
     groupID: string,
     userID: string,
     userRole = UserRole.Member,
-    requesterID: string): Promise<User> {
+    requesterID: string): Promise<void> {
 
-    await GroupFunctions.verifyUserCanPreformAction(
+    await GroupFunctions.verifyUserHasRequiredRole(
       groupID,
       requesterID,
       requiredRole.user.add(userRole),
@@ -75,6 +75,6 @@ export default class AddUserToGroup extends Endpoint {
       throw new Unexpected(`Unexpected error when adding user ${userID} to group ${groupID}`);
     }
 
-    return { id: userID, role: userRole };
+    return;
   }
 }

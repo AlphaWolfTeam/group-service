@@ -19,7 +19,7 @@ export default class SearchGroupByName extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const partialName = req.query.partialName;
 
     if (typeof(partialName) !== 'string') {
@@ -28,7 +28,7 @@ export default class SearchGroupByName extends Endpoint {
     }
 
     const groups: IGroup[] = await SearchGroupByName.logic(partialName);
-    res.json(groups);
+    res.status(200).json(groups);
   }
 
   static async logic(partialName: string): Promise<IGroup[]>  {

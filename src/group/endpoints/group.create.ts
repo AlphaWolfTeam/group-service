@@ -25,9 +25,20 @@ export default class CreateGroup extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
+    const group: IGroupPrimal = CreateGroup.extractAndTransform(req);
+    const createdGroup: IGroupPrimal = await CreateGroup.logic(group);
+    res.status(201).json(createdGroup);
+  }
+
+  /**
+   * extracts the params from the request, and transform its data to a Primal Group.
+   * @param req The http request containing the params.
+   * @returns an IGroupPrimal object.
+   */
+  static extractAndTransform(req: Request): IGroupPrimal {
     const requesterID = getRequesterIdFromRequest(req);
-    const group: IGroupPrimal = {
+    return {
       name: req.body.name,
       description: req.body.description,
       users: [{ id: requesterID, role: UserRole.Admin }],
@@ -35,8 +46,6 @@ export default class CreateGroup extends Endpoint {
       modifiedBy: requesterID,
       createdBy: requesterID,
     };
-    const createdGroup: IGroupPrimal = await CreateGroup.logic(group);
-    res.status(201).json(createdGroup);
   }
 
   /**

@@ -25,12 +25,13 @@ export default abstract class Endpoint {
     router[this.requestType](
       this.path,
       this.validateRequest(this.requestSchema),
-      this.wrapController(this.handler),
+      this.wrapController(this.requestHandler),
+      (req, res) => { console.log('Can you here me?'); },
     );
     return router;
   }
 
-  abstract handler(req: Request, res: Response): Promise<void>;
+  abstract requestHandler(req: Request, res: Response): Promise<void>;
 
   abstract createRequestSchema(): Joi.ObjectSchema;
 

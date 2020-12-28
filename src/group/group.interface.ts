@@ -9,7 +9,7 @@ export interface IGroupPrimal {
   createdBy: User['id'];
 }
 
-export interface IGroup {
+export interface IGroup extends IGroupPrimal {
   _id: string;
   name: string;
   description: string;

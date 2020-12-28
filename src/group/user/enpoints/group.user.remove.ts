@@ -29,7 +29,7 @@ export default class RemoveUserFromGroup extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
     const userToAdd: string = req.params['userID'];
@@ -54,13 +54,13 @@ export default class RemoveUserFromGroup extends Endpoint {
     userID: string,
     requesterID: string): Promise<string> {
 
-    const userRole = await GroupFunctions.getUserRoleInGroup(groupID, userID);
-    if(userRole === null) {
+    const userRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
+    if (userRole === null) {
       throw new UserIsNotInGroup(userID, groupID);
     }
     // A user can remove himself from a group regardless of his role in the group.
     if (userID !== requesterID) {
-      await GroupFunctions.verifyUserCanPreformAction(
+      await GroupFunctions.verifyUserHasRequiredRole(
         groupID,
         requesterID,
         requiredRole.user.delete(userRole),

@@ -36,17 +36,17 @@ export default class UpdateGroup extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
+    const requesterID = getRequesterIdFromRequest(req);
+
     let partialGroup: Partial<IGroup> = {
       name: req.body.name,
       description: req.body.description,
       type: req.body.type,
+      modifiedBy: requesterID,
     };
-    // Take only the fields that are not undefined.
-    partialGroup = pickBy(partialGroup, v => v !== undefined);
-
-    const requesterID = getRequesterIdFromRequest(req);
+    partialGroup = filterOutUndefinedFromGroup(partialGroup);
 
     const result = await UpdateGroup.logic(groupID, partialGroup, requesterID);
     res.status(200).json(result);
@@ -62,12 +62,15 @@ export default class UpdateGroup extends Endpoint {
    * @returns wether the group was modified correctly or not.
    */
   static async logic(id: string, partialGroup: Partial<IGroup>, requesterID: User['id']): Promise<IGroup> {
-    await GroupFunctions.verifyUserCanPreformAction(id, requesterID, requiredRole.update, `update group ${id} fields.`);
-    partialGroup.modifiedBy = requesterID;
-    try {
-      return await GroupRepository.updateById(id, partialGroup);
-    } catch (err) {
-      throw new Unexpected(`Unexpected mongoose error while updating group: ${err.message}`);
-    }
+    await GroupFunctions.verifyUserHasRequiredRole(id, requesterID, requiredRole.update, `update group ${id} fields.`);
+    return GroupRepository.updateById(id, partialGroup);
   }
 }
+
+/**
+ * filter out the fields with a undefined value from the object , and returns the new object.
+ * @param obj - the object to filter the undefined values from
+ */
+const filterOutUndefinedFromGroup = <T extends Object>(obj: T): Partial<T> => {
+  return pickBy(obj, v => v !== undefined);
+};

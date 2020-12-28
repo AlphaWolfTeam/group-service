@@ -20,10 +20,10 @@ export default class GetGroupByUserID extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const userID = req.params.id;
     const groups: IGroup[] = await GetGroupByUserID.logic(userID);
-    res.json(groups);
+    res.status(200).json(groups);
   }
 
   static async logic(id: string): Promise<IGroup[]>  {

@@ -6,6 +6,7 @@ import { GroupNotFound, CannotAccessGroup } from '../../utils/errors/client.erro
 import GroupFunctions from '../group.sharedFunctions';
 import { validateObjectID } from '../../utils/joi';
 import config from '../../config';
+import GroupRepository from '../group.repository';
 
 export default class GetGroupByID extends Endpoint {
 
@@ -24,12 +25,12 @@ export default class GetGroupByID extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const id = req.params.id;
     const requesterID = req.header(config.userHeader);
 
     const group: IGroup = await GetGroupByID.logic(id, requesterID);
-    res.json(group);
+    res.status(200).json(group);
   }
 
   /**
@@ -41,11 +42,11 @@ export default class GetGroupByID extends Endpoint {
    * @throws CannotAccessGroup if the group is private and the user is not in the group.
    */
   static async logic(id: string, requesterID?: string): Promise<IGroup>  {
-    const group = await GroupFunctions.getGroupByID(id);
+    const group = await GroupRepository.getById(id);
     if (!group) throw new GroupNotFound(id);
 
     if (group.type === GroupType.Private) {
-      if(!requesterID || !GroupFunctions.isUserInGroup(id, requesterID)) {
+      if (!requesterID || !GroupFunctions.isUserInGroup(id, requesterID)) {
         throw new CannotAccessGroup(group._id, requesterID);
       }
     }

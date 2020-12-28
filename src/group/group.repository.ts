@@ -1,7 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { IGroup, IGroupPrimal } from './group.interface';
 import { groupModel } from './group.model';
-import { UserIsNotInGroup } from '../utils/errors/client.error';
 import { UserRole } from './user/user.role';
 
 /**
@@ -36,15 +35,16 @@ export default class GroupRepository {
    * @param id - the id of the group to be deleted.
    */
   static deleteById(id: string): Promise<IGroup | null> {
-    return groupModel.findByIdAndRemove({ _id: new ObjectID(id) }).exec();
+    return groupModel.findByIdAndRemove({ _id: id }).exec();
   }
 
   /**
    * Gets a group by its id.
    * @param id - the id of the group.
+   * @returns a Group object or null if the group is not found.
    */
   static getById(id: string): Promise<IGroup | null> {
-    return groupModel.findById({ _id: new ObjectID(id) }).exec();
+    return groupModel.findById({ _id: id }).exec();
   }
 
   /**
@@ -52,7 +52,7 @@ export default class GroupRepository {
    * @param partialName - the partial name of the group.
    */
   static searchByName(partialName: string): Promise<IGroup[]> {
-    return groupModel.find({ name: { $regex: partialName } }).exec();
+    return groupModel.find({ name: { $regex: partialName, $options: 'i' } }).exec();
   }
 
   /**
@@ -60,13 +60,7 @@ export default class GroupRepository {
    * @param userID - the user ID.
    */
   static getGroupsOfUser(userID: string): Promise<IGroup[]> {
-    return groupModel.find({
-      users: {
-        $elemMatch: {
-          id: userID,
-        },
-      },
-    }).exec();
+    return groupModel.find({ 'users.id': userID }).exec();
   }
 
   /**

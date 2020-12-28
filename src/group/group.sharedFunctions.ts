@@ -2,30 +2,9 @@ import { GroupNotFound, UserCannotPreformActionOnGroup, UserIsNotInGroup } from 
 import GroupRepository from './group.repository';
 import { IGroup } from './group.interface';
 import { UserRole, isRoleSufficient } from './user/user.role';
+import { Unexpected } from '../utils/errors/server.error';
 
 export default class GroupFunctions {
-
-  /**
-   * getGroupByID finds a group by its ID.
-   * @param id - a group ID.
-   * @returns a Group object or null if the group is not found.
-   */
-  static async getGroupByID(id: string): Promise<IGroup | null>  {
-    return await GroupRepository.getById(id);
-  }
-
-  /**
-   * Gets a users role in a group.
-   * The function throws an error when:
-   * - The user is not in the group
-   * - The group does not even exist
-   * @param groupID - the ID of the group.
-   * @param userID - the ID of the user.
-   * @returns the user's role in the group.
-   */
-  static async getUserRoleInGroup(groupID: string, userID: string): Promise<UserRole | null> {
-    return await GroupRepository.getUserRoleFromGroup(groupID, userID);
-  }
 
   /**
    * Checks if a user is in a group.
@@ -34,7 +13,7 @@ export default class GroupFunctions {
    * @returns whether the user is in the group.
    */
   static async isUserInGroup(groupID: string, userID: string): Promise<boolean> {
-    const role = await this.getUserRoleInGroup(groupID, userID);
+    const role = await GroupRepository.getUserRoleFromGroup(groupID, userID);
     return (role !== null);
   }
 
@@ -49,22 +28,27 @@ export default class GroupFunctions {
    * @param requiredRole - The required role of the user.
    * @param actionDescription - a short description of the action for logging purposes.
    */
-  static async verifyUserCanPreformAction(groupID: string, userID: string, requiredRole: UserRole, actionDescription?: string): Promise<void> {
-    const usersRole = await this.getUserRoleInGroup(groupID, userID);
+  static async verifyUserHasRequiredRole(
+    groupID: string,
+    userID: string,
+    requiredRole: UserRole,
+    actionDescription?: string): Promise<void> {
 
-    if(usersRole === null) {
-      const group: IGroup | null = await this.getGroupByID(groupID);
-      if(!group) {
+    const usersRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
+
+    if (usersRole === null) {
+      const group: IGroup | null = await GroupRepository.getById(groupID);
+      if (!group) {
         throw new GroupNotFound(groupID);
       }
       throw new UserCannotPreformActionOnGroup(groupID, userID, 'the user is not in the group');
     }
     if (!isRoleSufficient(requiredRole, usersRole)) {
-      const actionMessage = actionDescription ? ` when trying to ${actionDescription}.` : '.';
+      const actionMessage = actionDescription ? `when trying to ${actionDescription}.` : '.';
       throw new UserCannotPreformActionOnGroup(
         groupID,
         userID,
-        `the user has a ${usersRole} role, but needs a ${requiredRole} role${actionMessage}`,
+        `the user has a ${usersRole} role, but needs a ${requiredRole} role ${actionMessage}`,
       );
     }
   }

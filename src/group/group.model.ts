@@ -1,11 +1,13 @@
 import { Schema, model, Document } from 'mongoose';
 import { IGroup, GroupType } from './group.interface';
+import userSchema from './user/user.schema';
 
 const groupSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
+      index: true,
     },
     description: {
       type: String,
@@ -16,19 +18,13 @@ const groupSchema = new Schema(
       default: GroupType.Public,
     },
     users: {
-      type: [{
-        _id : false,
-        id: { type: String, index: true },
-        role: Number,
-      }],
+      _id: false,
+      type: [userSchema],
       default: [],
     },
     modifiedBy: {
       type: String,
       required: true,
-    },
-    exchangeAddress: {
-      type: String,
     },
     externalSystem: {}, // Not Implemented
     createdBy: {

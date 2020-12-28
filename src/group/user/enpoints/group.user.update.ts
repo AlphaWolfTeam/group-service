@@ -5,7 +5,6 @@ import config from '../../../config';
 import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from '../../endpoints/group.endpoint';
 import GroupFunctions from '../../group.sharedFunctions';
 import { validateObjectID } from '../../../utils/joi';
-import User from '../user.interface';
 import { UserRole, requiredRole } from '../user.role';
 import GroupRepository from '../../group.repository';
 import { Unexpected } from '../../../utils/errors/server.error';
@@ -32,14 +31,14 @@ export default class UpdateUserRole extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
     const userToAdd: string = req.params['userID'];
     const userRole: UserRole = req.body['role'];
 
-    const addedUser = await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
-    res.status(200).json(addedUser);
+    await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
+    res.sendStatus(204);
   }
 
   /**
@@ -57,13 +56,13 @@ export default class UpdateUserRole extends Endpoint {
     groupID: string,
     userID: string,
     userRole = UserRole.Member,
-    requesterID: string): Promise<User> {
+    requesterID: string): Promise<void> {
 
-    const oldRole = await GroupFunctions.getUserRoleInGroup(groupID, userID);
-    if(oldRole === null) {
+    const oldRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
+    if (oldRole === null) {
       throw new UserIsNotInGroup(userID, groupID);
     }
-    await GroupFunctions.verifyUserCanPreformAction(
+    await GroupFunctions.verifyUserHasRequiredRole(
       groupID,
       requesterID,
       requiredRole.user.update(oldRole, userRole),
@@ -75,6 +74,6 @@ export default class UpdateUserRole extends Endpoint {
       throw new Unexpected(`Unexpected error when updating user ${userID} role ${userRole} to group ${groupID}`);
     }
 
-    return { id: userID, role: userRole };
+    return;
   }
 }

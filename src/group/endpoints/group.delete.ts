@@ -28,7 +28,7 @@ export default class DeleteGroup extends Endpoint {
     });
   }
 
-  async handler(req: Request, res: Response): Promise<void> {
+  async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID: string = getRequesterIdFromRequest(req);
 
@@ -47,7 +47,7 @@ export default class DeleteGroup extends Endpoint {
    * @returns wether the group was modified correctly or not.
    */
   static async logic(id: string, requesterID: User['id']): Promise<IGroup | null> {
-    await GroupFunctions.verifyUserCanPreformAction(id, requesterID, requiredRole.delete, `delete the group ${id}`);
+    await GroupFunctions.verifyUserHasRequiredRole(id, requesterID, requiredRole.delete, `delete the group ${id}`);
     return await GroupRepository.deleteById(id);
   }
 }
