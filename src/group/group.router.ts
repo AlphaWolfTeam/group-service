@@ -20,6 +20,6 @@ export default createFeatureRouter(
   new DeleteGroup(),          // DELETE /:id
   new GetUsersOfGroup(),      // GET    /:id/users
   new AddUserToGroup(),       // POST   /:id/users
-  new UpdateUserRole(),       // PUT    /:id/users/:id
-  new RemoveUserFromGroup(),  // DELETE /:id/users/:id
+  new UpdateUserRole(),       // PUT    /:id/users/:userID
+  new RemoveUserFromGroup(),  // DELETE /:id/users/:userID
 );

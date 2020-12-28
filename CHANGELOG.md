@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- get user by ID from Kartoffel.
-- find users by partial-name (top 20 result).
+- Basic RESTful group API.
 
-[unreleased]: https://github.com/meateam/file-service/compare/master...develop
+[unreleased]: https://github.com/AlphaWolfTeam/group-service/compare/master...develop
