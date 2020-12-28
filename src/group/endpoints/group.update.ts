@@ -1,18 +1,14 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import { pickBy } from 'lodash';
-
 import config from '../../config';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
-import GroupFunctions from '../group.sharedFunctions';
-import { IGroup, GroupType } from '../group.interface';
-import GroupRepository from '../group.repository';
-
-import { requiredRole } from '../user/user.role';
-import User from '../user/user.interface';
-
+import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../utils/endpoint';
 import { validateObjectID } from '../../utils/joi';
-import { Unexpected } from '../../utils/errors/server.error';
+import { GroupType, IGroup } from '../group.interface';
+import GroupRepository from '../group.repository';
+import GroupFunctions from '../group.sharedFunctions';
+import User from '../user/user.interface';
+import { requiredRole } from '../user/user.role';
 
 export default class UpdateGroup extends Endpoint {
 

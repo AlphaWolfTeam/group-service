@@ -1,6 +1,6 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import * as Joi from 'joi';
-import Endpoint, { HttpRequestType } from './group.endpoint';
+import Endpoint, { HttpRequestType } from '../../utils/endpoint';
 import { IGroup } from '../group.interface';
 import GroupRepository from '../group.repository';
 

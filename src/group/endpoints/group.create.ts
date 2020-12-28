@@ -1,9 +1,9 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import * as Joi from 'joi';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from './group.endpoint';
-import { IGroup, GroupType, IGroupPrimal } from '../group.interface';
-import GroupRepository from '../group.repository';
 import config from '../../config';
+import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../utils/endpoint';
+import { GroupType, IGroup, IGroupPrimal } from '../group.interface';
+import GroupRepository from '../group.repository';
 import { UserRole } from '../user/user.role';
 
 export default class CreateGroup extends Endpoint {

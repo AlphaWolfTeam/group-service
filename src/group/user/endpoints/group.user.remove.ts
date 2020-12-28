@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
-
 import config from '../../../config';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from '../../endpoints/group.endpoint';
-import GroupFunctions from '../../group.sharedFunctions';
-import { validateObjectID } from '../../../utils/joi';
-import User from '../user.interface';
-import { UserRole, requiredRole } from '../user.role';
-import GroupRepository from '../../group.repository';
-import { Unexpected } from '../../../utils/errors/server.error';
+import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
 import { UserIsNotInGroup } from '../../../utils/errors/client.error';
+import { Unexpected } from '../../../utils/errors/server.error';
+import { validateObjectID } from '../../../utils/joi';
+import GroupRepository from '../../group.repository';
+import GroupFunctions from '../../group.sharedFunctions';
+import { requiredRole, UserRole } from '../user.role';
 
 export default class RemoveUserFromGroup extends Endpoint {
 

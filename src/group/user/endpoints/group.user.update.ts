@@ -1,30 +1,28 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
-
 import config from '../../../config';
-import Endpoint, { HttpRequestType, getRequesterIdFromRequest } from '../../endpoints/group.endpoint';
-import { UserAlreadyExistsInGroup } from '../../../utils/errors/client.error';
-import GroupFunctions from '../../group.sharedFunctions';
-import { validateObjectID } from '../../../utils/joi';
-import User from '../user.interface';
-import { UserRole, requiredRole } from '../user.role';
-import GroupRepository from '../../group.repository';
+import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
+import { UserIsNotInGroup } from '../../../utils/errors/client.error';
 import { Unexpected } from '../../../utils/errors/server.error';
+import { validateObjectID } from '../../../utils/joi';
+import GroupRepository from '../../group.repository';
+import GroupFunctions from '../../group.sharedFunctions';
+import { requiredRole, UserRole } from '../user.role';
 
-export default class AddUserToGroup extends Endpoint {
+export default class UpdateUserRole extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.POST, '/:id/users');
+    super(HttpRequestType.PUT, '/:id/users/:userID');
   }
 
   createRequestSchema(): Joi.ObjectSchema {
     return Joi.object({
       params: {
         id: Joi.string().custom(validateObjectID).required(),
+        userID: Joi.string().custom(validateObjectID).required(),
       },
       body: {
-        id: Joi.string().custom(validateObjectID).required(),
-        role: Joi.number().min(0).max(2),
+        role: Joi.number().min(0).max(2).required(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -35,18 +33,18 @@ export default class AddUserToGroup extends Endpoint {
   async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
-    const userToAdd: string = req.body['id'];
+    const userToAdd: string = req.params['userID'];
     const userRole: UserRole = req.body['role'];
 
-    const addedUser = await AddUserToGroup.logic(groupID, userToAdd, userRole, requesterID);
+    await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
     res.sendStatus(204);
   }
 
   /**
-   * adds a user to a group.
+   * removes a user from a group.
    * The function throws an error in the following cases:
    * - The group does not exist.
-   * - The user already is in the group.
+   * - The user is not in the group.
    * - The requester user does not have permission to add the user.
    * @param groupID - the ID of the group.
    * @param userID - the ID of the user to add to the group.
@@ -59,20 +57,20 @@ export default class AddUserToGroup extends Endpoint {
     userRole = UserRole.Member,
     requesterID: string): Promise<void> {
 
+    const oldRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
+    if (oldRole === null) {
+      throw new UserIsNotInGroup(userID, groupID);
+    }
     await GroupFunctions.verifyUserHasRequiredRole(
       groupID,
       requesterID,
-      requiredRole.user.add(userRole),
-      `add a user to the group ${groupID}.`,
+      requiredRole.user.update(oldRole, userRole),
+      `update a user permission from ${UserRole[oldRole]} to ${UserRole[userRole]}.`,
     );
 
-    if (await GroupFunctions.isUserInGroup(groupID, userID)) {
-      throw new UserAlreadyExistsInGroup(groupID, userID);
-    }
-
-    const res = await GroupRepository.addUser(groupID, userID, userRole);
+    const res = await GroupRepository.updateUserRole(groupID, userID, userRole);
     if (!res) {
-      throw new Unexpected(`Unexpected error when adding user ${userID} to group ${groupID}`);
+      throw new Unexpected(`Unexpected error when updating user ${userID} role ${userRole} to group ${groupID}`);
     }
 
     return;
