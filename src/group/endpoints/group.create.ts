@@ -42,6 +42,7 @@ export default class CreateGroup extends Endpoint {
       name: req.body.name,
       description: req.body.description,
       users: [{ id: requesterID, role: UserRole.Admin }],
+      tags: req.body.tags,
       type: req.body.type || GroupType.Public,
       modifiedBy: requesterID,
       createdBy: requesterID,

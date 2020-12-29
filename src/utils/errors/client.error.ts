@@ -39,7 +39,7 @@ export class UserAlreadyExistsInGroup extends ClientError {
 
 export class CannotAccessGroup extends ClientError {
   constructor(groupID?: string, userID?: string) {
-    super(`The user ${userID} cannot get details on private group ${groupID} that he is not in.`, 403);
+    super(`The user ${userID} cannot get details on a private group ${groupID} that he is not in.`, 403);
   }
 }
 

@@ -16,7 +16,7 @@ export default createFeatureRouter(
   new GetGroupByUserID(),     // GET    /users/:id
   new SearchGroupByName(),    // GET    /
   new CreateGroup(),          // POST   /
-  new UpdateGroup(),          // PUT    /:id
+  new UpdateGroup(),          // PATCH  /:id
   new DeleteGroup(),          // DELETE /:id
   new GetUsersOfGroup(),      // GET    /:id/users
   new AddUserToGroup(),       // POST   /:id/users

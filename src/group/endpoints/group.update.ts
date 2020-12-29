@@ -13,7 +13,7 @@ import { requiredRole } from '../user/user.role';
 export default class UpdateGroup extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.PUT, '/:id');
+    super(HttpRequestType.PATCH, '/:id');
   }
 
   createRequestSchema(): Joi.ObjectSchema {

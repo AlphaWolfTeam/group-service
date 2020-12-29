@@ -103,8 +103,13 @@ describe('Group Service', () => {
   });
 
   describe('Search groups by name', () => {
-    test('should throw a validation error if partialName is not at least 2 chars', async () => {
+    test('should return a validation error if partialName is not at least 2 chars', async () => {
       const res = await request(app).get('/').query({ partialName: 'j' });
+      expect(res.status).toEqual(400);
+    });
+
+    test('should return a validation error if invalid type is sent', async () => {
+      const res = await request(app).get('/').query({ partialName: 'jo', type: 'not a type' });
       expect(res.status).toEqual(400);
     });
 
@@ -118,14 +123,47 @@ describe('Group Service', () => {
       expect(groups).toHaveLength(0);
     });
 
-    test('should return the groups that match the partialName', async() => {
+    test('should return the public groups that match the partialName', async() => {
       const group1 = await createGroupHelper({ name: 'fox' });
       const group2 = await createGroupHelper({ name: 'firefox' });
       const group3 = await createGroupHelper({ name: 'FireFox' });
       const group4 = await createGroupHelper({ name: 'fox-news' });
       const group5 = await createGroupHelper({ name: 'proxy' });
+      const group6 = await createGroupHelper({ name: 'fox', type: GroupType.Private });
 
-      const res = await request(app).get('/').query({ partialName: 'fox' });
+      let res = await request(app).get('/').query({ partialName: 'fox' });
+      expect(res.status).toEqual(200);
+
+      let groups: IGroup[] = res.body;
+      expect(groups).toHaveLength(4);
+
+      res = await request(app).get('/').query({ partialName: 'fox', type: GroupType.Public });
+      expect(res.status).toEqual(200);
+
+      groups = res.body;
+      expect(groups).toHaveLength(4);
+
+    });
+
+    test('should return a validation error if the group type is private and requester is not set', async() => {
+      await createGroupHelper({ name: 'my group', type: GroupType.Private });
+
+      const res = await request(app).get('/').query({ partialName: 'my', type: GroupType.Private });
+      expect(res.status).toEqual(400);
+    });
+
+    test('should return the private groups that match the partialName', async() => {
+      const group1 = await createGroupHelper({ name: 'fox', type: GroupType.Private, userID: USER_ID });
+      const group2 = await createGroupHelper({ name: 'firefox', type: GroupType.Private, userID: USER_ID });
+      const group3 = await createGroupHelper({ name: 'FireFox', type: GroupType.Private, userID: USER_ID });
+      const group4 = await createGroupHelper({ name: 'fox-news', type: GroupType.Private, userID: USER_ID });
+      const group5 = await createGroupHelper({ name: 'proxy', type: GroupType.Private, userID: USER_ID });
+      const group6 = await createGroupHelper({ name: 'fox', type: GroupType.Public, userID: USER_ID });
+
+      const res = await request(app)
+        .get('/')
+        .query({ partialName: 'fox', type: GroupType.Private })
+        .set({ [config.userHeader]: USER_ID });
       expect(res.status).toEqual(200);
 
       const groups: IGroup[] = res.body;
@@ -220,13 +258,26 @@ describe('Group Service', () => {
 
       expect(res.status).toEqual(400);
     });
+
+    test('should throw a validation error when illegal group type is sent', async() => {
+      const res = await request(app)
+        .post('/')
+        .send({
+          name: 'group',
+          description: 'a group',
+          type: 'not a type',
+        })
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(400);
+    });
   });
 
   describe('Update group values', () => {
     test('should throw a validation error if a requester is not sent', async () => {
       const group = await createGroupHelper();
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send({});
 
       expect(res.status).toEqual(400);
@@ -234,7 +285,7 @@ describe('Group Service', () => {
 
     test('should return NotFound error if the group does not exist', async () => {
       const res = await request(app)
-        .put(`/${GROUP_ID}`)
+        .patch(`/${GROUP_ID}`)
         .send({})
         .set({ [config.userHeader]: USER_ID });
 
@@ -251,7 +302,7 @@ describe('Group Service', () => {
       };
 
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send(partialGroup)
         .set({ [config.userHeader]: USER_2_ID });
 
@@ -270,7 +321,7 @@ describe('Group Service', () => {
       };
 
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send(partialGroup)
         .set({ [config.userHeader]: USER_2_ID });
 
@@ -289,7 +340,7 @@ describe('Group Service', () => {
       };
 
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send(partialGroup)
         .set({ [config.userHeader]: USER_2_ID });
 
@@ -306,7 +357,7 @@ describe('Group Service', () => {
       };
 
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send(partialGroup)
         .set({ [config.userHeader]: USER_ID });
 
@@ -330,7 +381,7 @@ describe('Group Service', () => {
       };
 
       const res = await request(app)
-        .put(`/${group._id}`)
+        .patch(`/${group._id}`)
         .send(partialGroup)
         .set({ [config.userHeader]: USER_ID });
 
@@ -344,6 +395,18 @@ describe('Group Service', () => {
       expect(updatedGroup).toHaveProperty('modifiedBy', USER_ID);
       expect(updatedGroup).toHaveProperty('createdBy', USER_ID);
 
+    });
+
+    test('should throw a validation error when illegal group type is sent', async() => {
+      const group = await createGroupHelper();
+      const res = await request(app)
+        .patch(`/${group._id}`)
+        .send({
+          type: 'not a type',
+        })
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(400);
     });
   });
 
@@ -420,6 +483,20 @@ describe('Group Service', () => {
         .get(`/${group._id}/users`);
 
       expect(res.status).toEqual(403);
+    });
+
+    test('should return users of a private group if the requester is in the group', async () => {
+      const group = await createGroupHelper({ userID: USER_ID, type: GroupType.Private });
+      const res = await request(app)
+        .get(`/${group._id}/users`)
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(200);
+
+      const users = res.body;
+      expect(users).toHaveLength(1);
+      expect(users[0]).toHaveProperty('id', USER_ID);
+      expect(users[0]).toHaveProperty('role', UserRole.Admin);
     });
 
     test('should return all the users of a group', async () => {
@@ -755,11 +832,13 @@ describe('Group Service', () => {
  * @param name
  * @returns the new created group.
  */
-const createGroupHelper = async ({ userID, name, type }: { userID?: string, name?: string, type?: GroupType } = {}) => {
+const createGroupHelper = async (
+  { userID, name, type, tags }: { userID?: string, name?: string, type?: GroupType, tags?: string[] } = {}) => {
   const group: IGroupPrimal = {
     name: name || 'group',
     description: 'a group',
     type: type || GroupType.Public,
+    tags: tags || [],
     users: [{
       id: userID || USER_ID,
       role: UserRole.Admin,

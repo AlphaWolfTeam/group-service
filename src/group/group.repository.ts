@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb';
-import { IGroup, IGroupPrimal } from './group.interface';
+import { IGroup, IGroupPrimal, GroupType } from './group.interface';
 import { groupModel } from './group.model';
 import { UserRole } from './user/user.role';
 
@@ -48,11 +48,23 @@ export default class GroupRepository {
   }
 
   /**
-   * Finds groups by partial name using regex.
+   * Finds public groups by partial name using regex.
    * @param partialName - the partial name of the group.
    */
-  static searchByName(partialName: string): Promise<IGroup[]> {
-    return groupModel.find({ name: { $regex: partialName, $options: 'i' } }).exec();
+  static searchPublicByName(partialName: string): Promise<IGroup[]> {
+    return groupModel.find({ name: { $regex: partialName, $options: 'i' }, type: GroupType.Public }).exec();
+  }
+
+  /**
+   * Finds private groups by user ID and partial name using regex.
+   * @param partialName - the partial name of the group.
+   */
+  static searchPrivateByNameAndUser(userID: string, partialName: string): Promise<IGroup[]> {
+    return groupModel.find({
+      name: { $regex: partialName, $options: 'i' },
+      type: GroupType.Private,
+      'users.id': userID,
+    }).exec();
   }
 
   /**

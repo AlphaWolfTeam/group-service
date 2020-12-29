@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 import { IGroup, GroupType } from './group.interface';
 import userSchema from './user/user.schema';
+import tagSchema from './tag/tag.schema';
 
 const groupSchema = new Schema(
   {
@@ -12,7 +13,11 @@ const groupSchema = new Schema(
     description: {
       type: String,
     },
-    tags: {}, // Not Implemented
+    tags: {
+      _id: false,
+      type: [tagSchema],
+      default: [],
+    },
     type: {
       type: GroupType,
       default: GroupType.Public,

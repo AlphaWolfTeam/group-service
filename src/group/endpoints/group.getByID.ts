@@ -46,7 +46,7 @@ export default class GetGroupByID extends Endpoint {
     if (!group) throw new GroupNotFound(id);
 
     if (group.type === GroupType.Private) {
-      if (!requesterID || !GroupFunctions.isUserInGroup(id, requesterID)) {
+      if (!requesterID || !await GroupFunctions.isUserInGroup(id, requesterID)) {
         throw new CannotAccessGroup(group._id, requesterID);
       }
     }

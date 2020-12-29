@@ -25,7 +25,8 @@ export default class GetUsersOfGroup extends Endpoint {
 
   async requestHandler(req: Request, res: Response): Promise<void> {
     const id = req.params.id;
-    const users: User[] = await GetUsersOfGroup.logic(id);
+    const requesterID = req.header(config.userHeader);
+    const users: User[] = await GetUsersOfGroup.logic(id, requesterID);
     res.status(200).json(users);
   }
 

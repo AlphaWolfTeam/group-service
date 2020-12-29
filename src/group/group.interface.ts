@@ -4,6 +4,7 @@ export interface IGroupPrimal {
   name: string;
   description: string;
   type: GroupType;
+  tags: string[];
   users: User[];
   modifiedBy: User['id'];
   createdBy: User['id'];
@@ -11,12 +12,6 @@ export interface IGroupPrimal {
 
 export interface IGroup extends IGroupPrimal {
   _id: string;
-  name: string;
-  description: string;
-  type: GroupType;
-  users: User[];
-  modifiedBy: User['id'];
-  createdBy: User['id'];
   exchangeAddress?: string;
   createdAt?: Date;
   updatedAt?: Date;
