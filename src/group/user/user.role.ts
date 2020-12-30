@@ -27,6 +27,7 @@ export function isRoleSufficient(sufficientRole: UserRole, role: UserRole): bool
 export const requiredRole = {
   delete: UserRole.Admin,
   update: UserRole.Modifier,
+  tag: UserRole.Modifier,
   user: {
     add: (role: UserRole) => {
       if (role <= UserRole.Modifier) {

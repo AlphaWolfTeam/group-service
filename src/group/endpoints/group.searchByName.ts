@@ -4,9 +4,7 @@ import Endpoint, { HttpRequestType } from '../../utils/endpoint';
 import { InvalidArgument } from '../../utils/errors/client.error';
 import { IGroup, GroupType } from '../group.interface';
 import GroupRepository from '../group.repository';
-import GroupFunctions from '../group.sharedFunctions';
 import config from '../../config';
-import { groupModel } from '../group.model';
 
 type Enum = {[s: number]: string};
 

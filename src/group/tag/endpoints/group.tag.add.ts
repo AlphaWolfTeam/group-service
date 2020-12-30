@@ -2,27 +2,25 @@ import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import config from '../../../config';
 import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
-import { UserIsNotInGroup } from '../../../utils/errors/client.error';
 import { Unexpected } from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
-import { requiredRole, UserRole } from '../user.role';
+import { requiredRole } from '../../user/user.role';
 
-export default class UpdateUserRole extends Endpoint {
+export default class AddTagToGroup extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.PUT, '/:id/users/:userID');
+    super(HttpRequestType.PUT, '/:id/tags');
   }
 
   createRequestSchema(): Joi.ObjectSchema {
     return Joi.object({
       params: {
         id: Joi.string().custom(validateObjectID).required(),
-        userID: Joi.string().custom(validateObjectID).required(),
       },
       body: {
-        role: Joi.number().min(0).max(2).required(),
+        tag: Joi.string().min(2),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -33,44 +31,36 @@ export default class UpdateUserRole extends Endpoint {
   async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
-    const userToAdd: string = req.params['userID'];
-    const userRole: UserRole = req.body['role'];
+    const tag: string = req.body['tag'];
 
-    await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
+    await AddTagToGroup.logic(groupID, tag, requesterID);
     res.sendStatus(204);
   }
 
   /**
-   * update a user role in a group.
+   * adds a tag to a group.
    * The function throws an error in the following cases:
    * - The group does not exist.
-   * - The user is not in the group.
-   * - The requester user does not have permission to add the user.
+   * - The requester user does not have permission to add tags.
    * @param groupID - the ID of the group.
-   * @param userID - the ID of the user to update.
-   * @param userRole - the new role.
+   * @param tag - the tag label.
    * @param requesterID - the ID of the user requesting the action.
    */
   static async logic(
     groupID: string,
-    userID: string,
-    userRole = UserRole.Member,
+    tag: string,
     requesterID: string): Promise<void> {
 
-    const oldRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
-    if (oldRole === null) {
-      throw new UserIsNotInGroup(userID, groupID);
-    }
     await GroupFunctions.verifyUserHasRequiredRole(
       groupID,
       requesterID,
-      requiredRole.user.update(oldRole, userRole),
-      `update a user permission from ${UserRole[oldRole]} to ${UserRole[userRole]}.`,
+      requiredRole.tag,
+      `add a tag to the group ${groupID}.`,
     );
 
-    const res = await GroupRepository.updateUserRole(groupID, userID, userRole);
+    const res = await GroupRepository.addTag(groupID, tag);
     if (!res) {
-      throw new Unexpected(`Unexpected error when updating user ${userID} role ${userRole} to group ${groupID}`);
+      throw new Unexpected(`Unexpected error when adding tag to group ${groupID}`);
     }
 
     return;

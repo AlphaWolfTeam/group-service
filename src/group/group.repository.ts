@@ -147,4 +147,32 @@ export default class GroupRepository {
 
     return group.users[0].role;
   }
+
+  /**
+   * Adds a tag to a group if its not already in the group.
+   * @param groupID - the groupID to add the tag to.
+   * @param label  - the tag label to add.
+   *
+   * @returns - wether the tag was successfully added.
+   */
+  static async addTag(groupID: string, label: string): Promise<boolean> {
+    const res = await groupModel.updateOne(
+      { _id: groupID },
+      { $addToSet: { tags: { label } } }).exec();
+    return res.n === 1 && res.nModified === 1 && res.ok === 1;
+  }
+
+  /**
+   * Removes a tag from a group.
+   * @param groupID - the groupID to remove the tag from.
+   * @param label  - the label of the tag to remove .
+   *
+   * @returns - wether the tag was successfully added.
+   */
+  static async removeTag(groupID: string, label: string): Promise<boolean> {
+    const res = await groupModel.updateOne(
+      { _id: groupID },
+      { $pull: { tags: { label } } }).exec();
+    return res.n === 1 && res.nModified === 1 && res.ok === 1;
+  }
 }

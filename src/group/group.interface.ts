@@ -4,7 +4,7 @@ export interface IGroupPrimal {
   name: string;
   description: string;
   type: GroupType;
-  tags: string[];
+  tags: { label: string }[];
   users: User[];
   modifiedBy: User['id'];
   createdBy: User['id'];

@@ -30,21 +30,20 @@ export default class RemoveUserFromGroup extends Endpoint {
   async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
     const requesterID = getRequesterIdFromRequest(req);
-    const userToAdd: string = req.params['userID'];
+    const userToRemove: string = req.params['userID'];
 
-    const deletedUserID = await RemoveUserFromGroup.logic(groupID, userToAdd, requesterID);
+    const deletedUserID = await RemoveUserFromGroup.logic(groupID, userToRemove, requesterID);
     res.status(200).json(deletedUserID);
   }
 
   /**
-   * updates a user role in a group.
+   * removes a user from a group.
    * The function throws an error in the following cases:
    * - The group does not exist.
    * - The user is not in the group.
-   * - The requester user does not have permission to add the user.
+   * - The requester user does not have permission to remove the user.
    * @param groupID - the ID of the group.
-   * @param userID - the ID of the user to add to the group.
-   * @param userRole - the role of the user to add to the group.
+   * @param userID - the ID of the user to remove from the group.
    * @param requesterID - the ID of the user requesting the action.
    */
   static async logic(
@@ -62,13 +61,13 @@ export default class RemoveUserFromGroup extends Endpoint {
         groupID,
         requesterID,
         requiredRole.user.delete(userRole),
-        `delete the user ${userID} with the role ${UserRole[userRole]} from the group ${groupID}.`,
+        `remove the user ${userID} with the role ${UserRole[userRole]} from the group ${groupID}.`,
         );
     }
 
     const res = await GroupRepository.removeUser(groupID, userID);
     if (!res) {
-      throw new Unexpected(`Unexpected error when deleting user ${userID} with role ${userRole} from the group ${groupID}`);
+      throw new Unexpected(`Unexpected error when removing user ${userID} with role ${userRole} from the group ${groupID}`);
     }
     return userID;
   }

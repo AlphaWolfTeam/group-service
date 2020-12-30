@@ -5,7 +5,6 @@ import { InvalidArgument } from './errors/client.error';
 import ValidateRequest from './joi';
 import { wrapController } from './wrappers';
 
-
 export default abstract class Endpoint {
 
   path: string;
