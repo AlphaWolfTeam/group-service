@@ -18,7 +18,7 @@ export default class RemoveTagFromGroup extends Endpoint {
     return Joi.object({
       params: {
         id: Joi.string().custom(validateObjectID).required(),
-        tag: Joi.string().min(0).max(2),
+        label: Joi.string().min(config.tagLengthMin).required(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),

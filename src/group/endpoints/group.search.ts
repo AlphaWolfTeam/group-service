@@ -6,9 +6,7 @@ import { IGroup, GroupType } from '../group.interface';
 import GroupRepository from '../group.repository';
 import config from '../../config';
 
-type Enum = {[s: number]: string};
-
-export default class SearchGroupByName extends Endpoint {
+export default class SearchGroup extends Endpoint {
 
   constructor() {
     super(HttpRequestType.GET, '/');
@@ -17,7 +15,7 @@ export default class SearchGroupByName extends Endpoint {
   createRequestSchema(): Joi.ObjectSchema {
     return Joi.object({
       query: {
-        partialName: Joi.string().min(2).required(),
+        partial: Joi.string().min(config.searchQueryLengthMin).required(),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
       headers: {
@@ -27,28 +25,28 @@ export default class SearchGroupByName extends Endpoint {
   }
 
   async requestHandler(req: Request, res: Response): Promise<void> {
-    const partialName = req.query.partialName;
-    if (typeof(partialName) !== 'string') throw new InvalidArgument('partialName should be a string');
+    const partial = req.query.partial;
+    if (typeof(partial) !== 'string') throw new InvalidArgument('partial should be a string');
 
     const type = req.query.type || GroupType.Public;
     if (!isSomeEnum(GroupType)(type)) throw new InvalidArgument('invalid group type');
 
     const requesterID = req.header(config.userHeader);
 
-    const groups: IGroup[] = await SearchGroupByName.logic(partialName, type, requesterID);
+    const groups: IGroup[] = await SearchGroup.logic(partial, type, requesterID);
     res.status(200).json(groups);
   }
 
-  static async logic(partialName: string, type: GroupType, userID?: string): Promise<IGroup[]>  {
+  static async logic(partial: string, type: GroupType, userID?: string): Promise<IGroup[]>  {
     switch (type) {
       case GroupType.Public:
-        return GroupRepository.searchPublicByName(partialName);
+        return GroupRepository.searchPublicByNameAndTag(partial);
       default: // Private
         if (!userID) {
           throw new InvalidArgument(`requester ID must be sent in the ${config.userHeader} header in order to search on private groups`);
 
         }
-        return GroupRepository.searchPrivateByNameAndUser(userID, partialName);
+        return GroupRepository.searchPrivate(userID, partial);
     }
   }
 }

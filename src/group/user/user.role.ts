@@ -11,6 +11,8 @@ export enum UserRole {
   Admin,
 }
 
+export const USER_ROLES_NUM = Object.keys(UserRole).length;
+
 /**
  * Returns whether a specific role is sufficient for an operation which requires a specific role.
  * Because the user roles are sorted in ascending order, the function just compare them with >=.

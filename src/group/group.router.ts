@@ -4,7 +4,7 @@ import CreateGroup from './endpoints/group.create';
 import DeleteGroup from './endpoints/group.delete';
 import GetGroupByID from './endpoints/group.getByID';
 import GetGroupByUserID from './endpoints/group.getByUser';
-import SearchGroupByName from './endpoints/group.searchByName';
+import SearchGroup from './endpoints/group.search';
 import UpdateGroup from './endpoints/group.update';
 // Tag Endpoints
 import AddTagToGroup from './tag/endpoints/group.tag.add';
@@ -18,7 +18,7 @@ import UpdateUserRole from './user/endpoints/group.user.update';
 export default createFeatureRouter(
   new GetGroupByID(),         // GET    /:id
   new GetGroupByUserID(),     // GET    /users/:id
-  new SearchGroupByName(),    // GET    /
+  new SearchGroup(),          // GET    /
   new CreateGroup(),          // POST   /
   new UpdateGroup(),          // PATCH  /:id
   new DeleteGroup(),          // DELETE /:id

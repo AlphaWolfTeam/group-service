@@ -20,7 +20,7 @@ export default class AddTagToGroup extends Endpoint {
         id: Joi.string().custom(validateObjectID).required(),
       },
       body: {
-        tag: Joi.string().min(2),
+        tag: Joi.string().min(config.tagLengthMin),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),

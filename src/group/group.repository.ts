@@ -27,7 +27,7 @@ export default class GroupRepository {
       _id,
       { $set: partialGroup },
       { runValidators: true, lean: true, new: true },
-      ).exec();
+    ).exec();
   }
 
   /**
@@ -48,22 +48,40 @@ export default class GroupRepository {
   }
 
   /**
-   * Finds public groups by partial name using regex.
-   * @param partialName - the partial name of the group.
-   */
-  static searchPublicByName(partialName: string): Promise<IGroup[]> {
-    return groupModel.find({ name: { $regex: partialName, $options: 'i' }, type: GroupType.Public }).exec();
+ * Finds public groups by partial name / tag using regex.
+ * @param partial - a string that can be a partial name/tag of the group.
+ */
+  static searchPublicByNameAndTag(partial: string): Promise<IGroup[]> {
+    return groupModel.find({
+      $and: [
+        { type: GroupType.Public },
+        {
+          $or: [
+            { name: { $regex: partial, $options: 'i' } },
+            { 'tags.label': { $regex: partial, $options: 'i' } },
+          ],
+        },
+      ],
+    }).exec();
   }
 
   /**
-   * Finds private groups by user ID and partial name using regex.
-   * @param partialName - the partial name of the group.
+   * Finds private groups by user ID and partial name / tag using regex.
+   * @param userID - an ID of a user that mut be in the returned groups.
+   * @param partial - a string that can be a partial name/tag of the group.
    */
-  static searchPrivateByNameAndUser(userID: string, partialName: string): Promise<IGroup[]> {
+  static searchPrivate(userID: string, partial: string): Promise<IGroup[]> {
     return groupModel.find({
-      name: { $regex: partialName, $options: 'i' },
-      type: GroupType.Private,
-      'users.id': userID,
+      $and: [
+        { type: GroupType.Private },
+        { 'users.id': userID },
+        {
+          $or: [
+            { name: { $regex: partial, $options: 'i' } },
+            { 'tags.label': { $regex: partial, $options: 'i' } },
+          ],
+        },
+      ],
     }).exec();
   }
 
@@ -127,14 +145,14 @@ export default class GroupRepository {
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
-   /**
-   * Return a user's role in a group.
-   * @param groupID - the ID of the group.
-   * @param userID - the ID of the user.
-   * @returns the user's role in the group, or null in the following cases:
-   * - The user is not in the group
-   * - The group does not even exist
-   */
+  /**
+  * Return a user's role in a group.
+  * @param groupID - the ID of the group.
+  * @param userID - the ID of the user.
+  * @returns the user's role in the group, or null in the following cases:
+  * - The user is not in the group
+  * - The group does not even exist
+  */
   static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole | null> {
 
     const group = await groupModel
@@ -169,7 +187,8 @@ export default class GroupRepository {
    *
    * @returns - wether the tag was successfully added.
    */
-  static async removeTag(groupID: string, label: string): Promise<boolean> {
+  static async removeTag(groupID: string, tag: string): Promise<boolean> {
+    const label = tag.toLowerCase();
     const res = await groupModel.updateOne(
       { _id: groupID },
       { $pull: { tags: { label } } }).exec();

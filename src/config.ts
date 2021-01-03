@@ -9,4 +9,6 @@ export default {
     featureCollectionName: env.get('MONGO_FEATURE_COLLECTION_NAME').default('groups').asString(),
   },
   userHeader: env.get('USER_HEADER').default('X-User-ID').asString().toLowerCase(),
+  tagLengthMin: env.get('TAG_LENGTH_MIN').default('2').asInt(),
+  searchQueryLengthMin: env.get('SEARCH_QUERY_LENGTH_MIN').default('2').asInt(),
 };

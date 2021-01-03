@@ -101,72 +101,89 @@ describe('Group Service', () => {
     });
   });
 
-  describe('Search groups by name', () => {
-    test('should return a validation error if partialName is not at least 2 chars', async () => {
-      const res = await request(app).get('/').query({ partialName: 'j' });
+  describe('Search groups by partial string', () => {
+    test('should return a validation error if partial is not at least 2 chars', async () => {
+      const res = await request(app).get('/').query({ partial: 'j' });
       expect(res.status).toEqual(400);
     });
 
     test('should return a validation error if invalid type is sent', async () => {
-      const res = await request(app).get('/').query({ partialName: 'jo', type: 'not a type' });
+      const res = await request(app).get('/').query({ partial: 'jo', type: 'not a type' });
       expect(res.status).toEqual(400);
     });
 
     test('should return an empty array if there is no matching group', async () => {
       await createGroupHelper();
 
-      const res = await request(app).get('/').query({ partialName: 'hello' });
+      const res = await request(app).get('/').query({ partial: 'hello' });
       expect(res.status).toEqual(200);
 
       const groups: IGroup[] = res.body;
       expect(groups).toHaveLength(0);
     });
 
-    test('should return the public groups that match the partialName', async() => {
-      const group1 = await createGroupHelper({ name: 'fox' });
-      const group2 = await createGroupHelper({ name: 'firefox' });
-      const group3 = await createGroupHelper({ name: 'FireFox' });
-      const group4 = await createGroupHelper({ name: 'fox-news' });
-      const group5 = await createGroupHelper({ name: 'proxy' });
-      const group6 = await createGroupHelper({ name: 'fox', type: GroupType.Private });
+    test('should return the public groups that match the partial string', async() => {
+      await createGroupHelper({ name: 'fox' });
+      await createGroupHelper({ name: 'firefox' });
+      await createGroupHelper({ name: 'FireFox' });
+      await createGroupHelper({ name: 'fox-news' });
+      await createGroupHelper({ name: 'fox-news', tags: ['news', 'fox'] });
+      await createGroupHelper({ name: 'abc-news', tags: ['not-fox-news'] });
 
-      let res = await request(app).get('/').query({ partialName: 'fox' });
+      let res = await request(app).get('/').query({ partial: 'fox' });
       expect(res.status).toEqual(200);
 
       let groups: IGroup[] = res.body;
-      expect(groups).toHaveLength(4);
+      expect(groups).toHaveLength(6);
 
-      res = await request(app).get('/').query({ partialName: 'fox', type: GroupType.Public });
+      await createGroupHelper({ name: 'proxy' });
+      await createGroupHelper({ name: 'reverse proxy', tags: ['proxy'] });
+      await createGroupHelper({ name: 'fox', tags: ['fox'], type: GroupType.Private });
+
+      res = await request(app).get('/').query({ partial: 'fox', type: GroupType.Public });
       expect(res.status).toEqual(200);
 
       groups = res.body;
-      expect(groups).toHaveLength(4);
+      expect(groups).toHaveLength(6);
 
     });
 
     test('should return a validation error if the group type is private and requester is not set', async() => {
       await createGroupHelper({ name: 'my group', type: GroupType.Private });
 
-      const res = await request(app).get('/').query({ partialName: 'my', type: GroupType.Private });
+      const res = await request(app).get('/').query({ partial: 'my', type: GroupType.Private });
       expect(res.status).toEqual(400);
     });
 
-    test('should return the private groups that match the partialName', async() => {
-      const group1 = await createGroupHelper({ name: 'fox', type: GroupType.Private, userID: USER_ID });
-      const group2 = await createGroupHelper({ name: 'firefox', type: GroupType.Private, userID: USER_ID });
-      const group3 = await createGroupHelper({ name: 'FireFox', type: GroupType.Private, userID: USER_ID });
-      const group4 = await createGroupHelper({ name: 'fox-news', type: GroupType.Private, userID: USER_ID });
-      const group5 = await createGroupHelper({ name: 'proxy', type: GroupType.Private, userID: USER_ID });
-      const group6 = await createGroupHelper({ name: 'fox', type: GroupType.Public, userID: USER_ID });
+    test('should return the private groups that match the partial string', async() => {
+      await createGroupHelper({ name: 'fox', type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'firefox', type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'FireFox', type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'fox-news', type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'fox-news', tags: ['news', 'fox'], type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'abc-news', tags: ['not-fox-news'], type: GroupType.Private, userID: USER_ID });
 
-      const res = await request(app)
+      let res = await request(app)
         .get('/')
-        .query({ partialName: 'fox', type: GroupType.Private })
+        .query({ partial: 'fox', type: GroupType.Private })
         .set({ [config.userHeader]: USER_ID });
       expect(res.status).toEqual(200);
 
-      const groups: IGroup[] = res.body;
-      expect(groups).toHaveLength(4);
+      let groups: IGroup[] = res.body;
+      expect(groups).toHaveLength(6);
+
+      await createGroupHelper({ name: 'proxy', type: GroupType.Private, userID: USER_ID });
+      await createGroupHelper({ name: 'fox', type: GroupType.Public, userID: USER_ID });
+      await createGroupHelper({ name: 'reverse proxy', tags: ['proxy'], type: GroupType.Public, userID: USER_ID });
+
+      res = await request(app)
+        .get('/')
+        .query({ partial: 'fox', type: GroupType.Private })
+        .set({ [config.userHeader]: USER_ID });
+      expect(res.status).toEqual(200);
+
+      groups = res.body;
+      expect(groups).toHaveLength(6);
 
     });
   });
@@ -939,6 +956,24 @@ describe('Group Service', () => {
         tags = updatedGroup.tags;
         expect(tags).toHaveLength(1);
         expect(tags[0]).toHaveProperty('label', label);
+      });
+
+      test('tags should be case invariant', async () => {
+        const group = await createGroupHelper({ userID: USER_ID });
+        const label = 'ImporTant';
+        const lowerCasedLabel = label.toLowerCase();
+        const res = await request(app)
+          .put(`/${group._id}/tags`)
+          .send({ tag: label })
+          .set({ [config.userHeader]: USER_ID });
+
+        expect(res.status).toEqual(204);
+
+        const updatedGroup = await GroupRepository.getById(group._id) as IGroup;
+        expect(updatedGroup).toHaveProperty('tags');
+        const tags = updatedGroup.tags;
+        expect(tags).toHaveLength(1);
+        expect(tags[0]).toHaveProperty('label', lowerCasedLabel);
       });
     });
 

@@ -7,7 +7,7 @@ import { Unexpected } from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
-import { requiredRole, UserRole } from '../user.role';
+import { requiredRole, UserRole, USER_ROLES_NUM } from '../user.role';
 
 export default class UpdateUserRole extends Endpoint {
 
@@ -22,7 +22,7 @@ export default class UpdateUserRole extends Endpoint {
         userID: Joi.string().custom(validateObjectID).required(),
       },
       body: {
-        role: Joi.number().min(0).max(2).required(),
+        role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
