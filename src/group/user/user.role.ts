@@ -32,10 +32,8 @@ export const requiredRole = {
   tag: UserRole.Modifier,
   user: {
     add: (role: UserRole) => {
-      if (role <= UserRole.Modifier) {
-        return UserRole.Modifier;
-      }
-      return role;
+      // Must be at least a modifier
+      return Math.max(role, UserRole.Modifier);
     },
     update: (from: UserRole, to: UserRole) => {
       // promotion
@@ -43,18 +41,11 @@ export const requiredRole = {
         return to;
       }
       // demotion
-      if (from === UserRole.Modifier) {
-        // only a admin can demote a modifier
-        return UserRole.Admin;
-      }
-      return from;
+      return Math.min(from + 1, UserRole.Admin);
     },
     delete: (role: UserRole) => {
-      // an admin can delete another admin.
-      if (role === UserRole.Admin) {
-        return role;
-      }
-      return role + 1;
+      // must have higher permission or if is an admin.
+      return Math.min(role + 1, UserRole.Admin);
     },
   },
 };

@@ -51,7 +51,7 @@ export default class GroupRepository {
  * Finds public groups by partial name / tag using regex.
  * @param partial - a string that can be a partial name/tag of the group.
  */
-  static searchPublicByNameAndTag(partial: string): Promise<IGroup[]> {
+  static searchPublic(partial: string): Promise<IGroup[]> {
     return groupModel.find({
       $and: [
         { type: GroupType.Public },

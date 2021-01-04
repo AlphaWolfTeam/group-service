@@ -22,7 +22,7 @@ export default createFeatureRouter(
   new CreateGroup(),          // POST   /
   new UpdateGroup(),          // PATCH  /:id
   new DeleteGroup(),          // DELETE /:id
-  new AddTagToGroup(),        // PUT    /:id/tags
+  new AddTagToGroup(),        // PUT    /:id/tags/:label
   new RemoveTagFromGroup(),   // DELETE /:id/tags/:label
   new GetUsersOfGroup(),      // GET    /:id/users
   new AddUserToGroup(),       // POST   /:id/users

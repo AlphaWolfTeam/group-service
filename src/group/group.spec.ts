@@ -850,8 +850,7 @@ describe('Group Service', () => {
         const group = await createGroupHelper({ userID: USER_ID });
         const label = 'important';
         const res = await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(204);
@@ -867,8 +866,7 @@ describe('Group Service', () => {
         const group = await createGroupHelper({ userID: USER_ID });
         const label = 'l';
         const res = await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(400);
@@ -882,8 +880,7 @@ describe('Group Service', () => {
       test('should return NotFound in case the group does not exist', async () => {
         const label = 'important';
         const res = await request(app)
-          .put(`/${GROUP_ID}/tags`)
-          .send({ tag: label })
+          .put(`/${GROUP_ID}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(404);
@@ -894,13 +891,11 @@ describe('Group Service', () => {
         const label = 'important';
 
         await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         const res = await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(204);
@@ -918,8 +913,7 @@ describe('Group Service', () => {
 
         const label = 'important';
         const res = await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_3_ID });
 
         expect(res.status).toEqual(403);
@@ -935,12 +929,10 @@ describe('Group Service', () => {
         const group2 = await createGroupHelper({ userID: USER_ID });
         const label = 'important';
         await request(app)
-          .put(`/${group1._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group1._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
         const res = await request(app)
-          .put(`/${group2._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group2._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(204);
@@ -963,8 +955,7 @@ describe('Group Service', () => {
         const label = 'ImporTant';
         const lowerCasedLabel = label.toLowerCase();
         const res = await request(app)
-          .put(`/${group._id}/tags`)
-          .send({ tag: label })
+          .put(`/${group._id}/tags/${label}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(204);

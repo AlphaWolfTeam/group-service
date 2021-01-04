@@ -11,16 +11,14 @@ import { requiredRole } from '../../user/user.role';
 export default class AddTagToGroup extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.PUT, '/:id/tags');
+    super(HttpRequestType.PUT, '/:id/tags/:label');
   }
 
   createRequestSchema(): Joi.ObjectSchema {
     return Joi.object({
       params: {
         id: Joi.string().custom(validateObjectID).required(),
-      },
-      body: {
-        tag: Joi.string().min(config.tagLengthMin),
+        label: Joi.string().min(config.tagLengthMin).required(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -30,10 +28,10 @@ export default class AddTagToGroup extends Endpoint {
 
   async requestHandler(req: Request, res: Response): Promise<void> {
     const groupID: string = req.params['id'];
+    const label: string = req.params['label'];
     const requesterID = getRequesterIdFromRequest(req);
-    const tag: string = req.body['tag'];
 
-    await AddTagToGroup.logic(groupID, tag, requesterID);
+    await AddTagToGroup.logic(groupID, label, requesterID);
     res.sendStatus(204);
   }
 

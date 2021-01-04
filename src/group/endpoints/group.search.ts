@@ -40,11 +40,10 @@ export default class SearchGroup extends Endpoint {
   static async logic(partial: string, type: GroupType, userID?: string): Promise<IGroup[]>  {
     switch (type) {
       case GroupType.Public:
-        return GroupRepository.searchPublicByNameAndTag(partial);
+        return GroupRepository.searchPublic(partial);
       default: // Private
         if (!userID) {
           throw new InvalidArgument(`requester ID must be sent in the ${config.userHeader} header in order to search on private groups`);
-
         }
         return GroupRepository.searchPrivate(userID, partial);
     }
