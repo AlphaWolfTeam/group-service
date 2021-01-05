@@ -21,7 +21,6 @@
     "env-var": "^7.0.0",
     "express": "^4.17.1",
     "helmet": "^4.2.0",
-    "http": "0.0.1-security",
     "joi": "^17.3.0",
     "lodash": "^4.17.20",
     "mongoose": "5.10.1",
