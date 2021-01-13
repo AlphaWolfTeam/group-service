@@ -629,14 +629,14 @@ describe('Group Service', () => {
         await addUserToGroupHelper(group._id, USER_2_ID, UserRole.Modifier);
 
         let res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(204);
 
         res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Member })
           .set({ [config.userHeader]: USER_ID });
 
@@ -645,7 +645,7 @@ describe('Group Service', () => {
 
       test('should return NotFound error if the group does not exist', async () => {
         const res = await request(app)
-          .put(`/${GROUP_ID}/users/${USER_2_ID}`)
+          .patch(`/${GROUP_ID}/users/${USER_2_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_ID });
 
@@ -657,7 +657,7 @@ describe('Group Service', () => {
         await addUserToGroupHelper(group._id, USER_2_ID, UserRole.Modifier);
 
         const res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .set({ [config.userHeader]: USER_ID });
 
         expect(res.status).toEqual(400);
@@ -668,7 +668,7 @@ describe('Group Service', () => {
         await addUserToGroupHelper(group._id, USER_2_ID, UserRole.Modifier);
 
         const res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_3_ID });
 
@@ -679,7 +679,7 @@ describe('Group Service', () => {
         const group = await createGroupHelper({ userID: USER_ID });
 
         const res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_ID });
 
@@ -693,7 +693,7 @@ describe('Group Service', () => {
 
         // a modifier trying to promote himself to admin
         let res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_2_ID });
 
@@ -701,7 +701,7 @@ describe('Group Service', () => {
 
         // a modifier trying to demote an admin
         res = await request(app)
-          .put(`/${group._id}/users/${USER_ID}`)
+          .patch(`/${group._id}/users/${USER_ID}`)
           .send({ role: UserRole.Modifier })
           .set({ [config.userHeader]: USER_2_ID });
 
@@ -709,7 +709,7 @@ describe('Group Service', () => {
 
         // a modifier trying to promote himself to admin
         res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .patch(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Member })
           .set({ [config.userHeader]: USER_3_ID });
 
@@ -818,7 +818,7 @@ describe('Group Service', () => {
 
         // a modifier trying to delete an admin
         let res = await request(app)
-          .put(`/${group._id}/users/${USER_ID}`)
+          .delete(`/${group._id}/users/${USER_ID}`)
           .send({ role: UserRole.Admin })
           .set({ [config.userHeader]: USER_2_ID });
 
@@ -826,7 +826,7 @@ describe('Group Service', () => {
 
         // a modifier trying to delete another modifier
         res = await request(app)
-          .put(`/${group._id}/users/${USER_2_ID}`)
+          .delete(`/${group._id}/users/${USER_2_ID}`)
           .send({ role: UserRole.Modifier })
           .set({ [config.userHeader]: USER_3_ID });
 
@@ -834,7 +834,7 @@ describe('Group Service', () => {
 
         // a member trying to delete a member
         res = await request(app)
-          .put(`/${group._id}/users/${USER_3_ID}`)
+          .delete(`/${group._id}/users/${USER_3_ID}`)
           .send({ role: UserRole.Member })
           .set({ [config.userHeader]: USER_4_ID });
 

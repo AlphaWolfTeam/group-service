@@ -12,7 +12,7 @@ import { requiredRole, UserRole, USER_ROLES_NUM } from '../user.role';
 export default class UpdateUserRole extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.PUT, '/:id/users/:userID');
+    super(HttpRequestType.PATCH, '/:id/users/:userID');
   }
 
   createRequestSchema(): Joi.ObjectSchema {

@@ -41,11 +41,13 @@ export default class SearchGroup extends Endpoint {
     switch (type) {
       case GroupType.Public:
         return GroupRepository.searchPublic(partial);
-      default: // Private
+      case GroupType.Private:
         if (!userID) {
           throw new InvalidArgument(`requester ID must be sent in the ${config.userHeader} header in order to search on private groups`);
         }
         return GroupRepository.searchPrivate(userID, partial);
+      default:
+        throw new InvalidArgument(`cannot search groups of type ${type}.`);
     }
   }
 }

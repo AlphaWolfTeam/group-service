@@ -35,7 +35,7 @@ const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationO
   return wrapValidator(validator);
 };
 
-export const validateObjectID = (value: any, helpers: Joi.CustomHelpers) => {
+export const validateObjectID = (value: any) => {
   if (!mongoose.Types.ObjectId.isValid(value)) {
     throw new NotAnObjectID(value);
   }

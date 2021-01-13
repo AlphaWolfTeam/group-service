@@ -26,6 +26,6 @@ export default createFeatureRouter(
   new RemoveTagFromGroup(),   // DELETE /:id/tags/:label
   new GetUsersOfGroup(),      // GET    /:id/users
   new AddUserToGroup(),       // POST   /:id/users
-  new UpdateUserRole(),       // PUT    /:id/users/:userID
+  new UpdateUserRole(),       // PATCH  /:id/users/:userID
   new RemoveUserFromGroup(),  // DELETE /:id/users/:userID
 );
