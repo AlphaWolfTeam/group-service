@@ -5,19 +5,20 @@
   The service should be connected to a mongodb in order to run.
 
 ## API Endpoints
-| Method 	| Endpoint            | [User Header](###user-header) Required  | Description                     | Example           	              | Reference
-|---------|---------------------|-----------------------------------------|---------------------------------|--------------------------------|--------------------------
-| GET     | /:id                | Sometimes | Get group by ID               | /12345678987                    |
-| GET    	| /users/:id          | **Yes**   | Get group by user ID          | /users/12345678987              |
-| GET     | /                   | Sometimes | Search group by name          | /?partialName=team              |
-| POST    | /                   | **Yes**   | Create Group                  | /                               | [body params](###create-group)
-| PUT     | /:id                | **Yes**   | Update group fields           | /12345678987                    | [body params](###update-group)
-| DELETE  | /:id                | **Yes**   | Delete group by ID            | /12345678987                    |
-| GET     | /:id/users          | Sometimes | Get users of group            | /12345678987/users              |
-| POST    | /:id/users          | **Yes**   | Add user group                | /12345678987/users              | [body params](###add-user-to-group)
-| PUT     | /:id/users/:userID  | **Yes**   | Update user role in group     | /12345678987/users/98765432123  | [body params](###update-user's-role-in-group)
-| DELETE  | /:id/users/:userID  | **Yes**   | Remove user from group        | /12345678987/users/98765432123  |
-
+| Method                    | Verb   | Route             | [User Header](###user-header) Required | Reference                                      |
+|---------------------------|--------|-------------------|---------------------------------------------|------------------------------------------------|
+| Get group by ID           | GET    | /:id              | Sometimes                                   |                                                |
+| Get groups by user        | GET    | /users/:id        | **Yes**                                     |                                                |
+| Search Group              | GET    | /                 | Sometimes                                   |                                                |
+| Create Group              | POST   | /                 | **Yes**                                     | [body params](###create-group)                 |
+| Update Group              | PATCH  | /:id              | **Yes**                                     | [body params](###update-group)                 |
+| Delete Group              | DELETE | /:id              | **Yes**                                     |                                                |
+| Add tag to group          | PUT    | /:id/tags/:label  | **Yes**                                     |                                                |
+| Remove tag from group     | DELETE | /:id/tags/:label  | **Yes**                                     |                                                |
+| Add user to group         | POST   | /groups/:id/users | **Yes**                                     | [body params](###add-user-to-group)            |
+| Update user role in group | PATCH  | /:id/users/:id    | **Yes**                                     | [body params](###update-user's-role-in-group)  |
+| Remove user from group    | DELETE | /:id/users/:id    | **Yes**                                     |                                                |
+| Get users of group        | GET    | /:id/users        | Sometimes                                   |                                                |
 
 ## Roles and Permissions
 ### User Roles

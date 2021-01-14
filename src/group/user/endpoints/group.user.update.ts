@@ -7,12 +7,12 @@ import { Unexpected } from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
-import { requiredRole, UserRole } from '../user.role';
+import { requiredRole, UserRole, USER_ROLES_NUM } from '../user.role';
 
 export default class UpdateUserRole extends Endpoint {
 
   constructor() {
-    super(HttpRequestType.PUT, '/:id/users/:userID');
+    super(HttpRequestType.PATCH, '/:id/users/:userID');
   }
 
   createRequestSchema(): Joi.ObjectSchema {
@@ -22,7 +22,7 @@ export default class UpdateUserRole extends Endpoint {
         userID: Joi.string().custom(validateObjectID).required(),
       },
       body: {
-        role: Joi.number().min(0).max(2).required(),
+        role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -41,14 +41,14 @@ export default class UpdateUserRole extends Endpoint {
   }
 
   /**
-   * removes a user from a group.
+   * update a user role in a group.
    * The function throws an error in the following cases:
    * - The group does not exist.
    * - The user is not in the group.
    * - The requester user does not have permission to add the user.
    * @param groupID - the ID of the group.
-   * @param userID - the ID of the user to add to the group.
-   * @param userRole - the role of the user to add to the group.
+   * @param userID - the ID of the user to update.
+   * @param userRole - the new role.
    * @param requesterID - the ID of the user requesting the action.
    */
   static async logic(

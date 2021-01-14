@@ -5,7 +5,6 @@ import { InvalidArgument } from './errors/client.error';
 import ValidateRequest from './joi';
 import { wrapController } from './wrappers';
 
-
 export default abstract class Endpoint {
 
   path: string;
@@ -49,6 +48,7 @@ export enum HttpRequestType {
   GET = 'get',
   POST = 'post',
   PUT = 'put',
+  PATCH = 'patch',
   DELETE = 'delete',
 }
 

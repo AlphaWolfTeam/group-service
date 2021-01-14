@@ -45,12 +45,10 @@ export default class GetGroupByID extends Endpoint {
     const group = await GroupRepository.getById(id);
     if (!group) throw new GroupNotFound(id);
 
-    if (group.type === GroupType.Private) {
-      if (!requesterID || !GroupFunctions.isUserInGroup(id, requesterID)) {
-        throw new CannotAccessGroup(group._id, requesterID);
-      }
+    if ((group.type === GroupType.Private) &&
+        !(requesterID && await GroupFunctions.isUserInGroup(id, requesterID))) {
+      throw new CannotAccessGroup(group._id, requesterID);
     }
-
     return group;
   }
 
