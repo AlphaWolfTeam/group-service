@@ -1,3 +1,4 @@
+import * as apm from 'elastic-apm-node';
 import * as http from 'http';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
@@ -8,6 +9,7 @@ import { once } from 'events';
 import errorMiddleware from './utils/errors/error.middleware';
 import GroupRouter from './group/group.router';
 import { ResourceNotFound } from './utils/errors/client.error';
+import config from './config';
 
 export default class Server {
   app: express.Application;
@@ -20,6 +22,7 @@ export default class Server {
     this.env = env;
     this.app = express();
 
+    this.configureAPM();
     this.configureMiddleware();
     this.configureApiRoutes();
     this.configureErrorHandlers();
@@ -36,6 +39,17 @@ export default class Server {
 
   private configureApiRoutes() {
     this.app.use(GroupRouter);
+  }
+
+  private configureAPM() {
+    const apmAgent = apm.start({
+      serviceName: 'group-service',
+      secretToken: config.apm.secretToken,
+      serverUrl: config.apm.serverUrl,
+      active: config.apm.isActive === 'true',
+      environment: config.service.environment,
+    });
+    if (apmAgent.isStarted()) console.log('APM Agent started');
   }
 
   // configureErrorHandlers
