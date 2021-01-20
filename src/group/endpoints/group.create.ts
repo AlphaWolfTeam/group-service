@@ -16,7 +16,8 @@ export default class CreateGroup extends Endpoint {
     return Joi.object({
       body: {
         name: Joi.string().required(),
-        description: Joi.string().required(),
+        description: Joi.string().required(), // in the group.model this is not requried
+        icon: Joi.string().base64(),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
       headers: {
@@ -41,6 +42,7 @@ export default class CreateGroup extends Endpoint {
     return {
       name: req.body.name,
       description: req.body.description,
+      icon: req.body.icon,
       users: [{ id: requesterID, role: UserRole.Admin }],
       tags: req.body.tags,
       type: req.body.type || GroupType.Public,

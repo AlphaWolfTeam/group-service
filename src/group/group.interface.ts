@@ -3,6 +3,7 @@ import User from './user/user.interface';
 export interface IGroupPrimal {
   name: string;
   description: string;
+  icon: string;
   type: GroupType;
   tags: { label: string }[];
   users: User[];

@@ -13,6 +13,9 @@ const groupSchema = new Schema(
     description: {
       type: String,
     },
+    icon: {
+      type: String,
+    },
     tags: {
       _id: false,
       type: [tagSchema],
