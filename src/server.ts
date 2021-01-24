@@ -11,11 +11,14 @@ import { ResourceNotFound } from './utils/errors/client.error';
 
 export default class Server {
   app: express.Application;
+
   private http: http.Server | undefined;
+
   private port: string;
+
   private env: string;
 
-  constructor(port: string, env:string = 'prod') {
+  constructor(port: string, env = 'prod') {
     this.port = port;
     this.env = env;
     this.app = express();

@@ -3,38 +3,35 @@ import * as Joi from 'joi';
 import config from '../../../config';
 import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
 import { UserIsNotInGroup } from '../../../utils/errors/client.error';
-import { Unexpected } from '../../../utils/errors/server.error';
+import Unexpected from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
 import { requiredRole, UserRole, USER_ROLES_NUM } from '../user.role';
 
 export default class UpdateUserRole extends Endpoint {
-
   constructor() {
     super(HttpRequestType.PATCH, '/:id/users/:userID');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      params: {
-        id: Joi.string().custom(validateObjectID).required(),
-        userID: Joi.string().custom(validateObjectID).required(),
-      },
-      body: {
-        role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    params: {
+      id: Joi.string().custom(validateObjectID).required(),
+      userID: Joi.string().custom(validateObjectID).required(),
+    },
+    body: {
+      role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  })
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
-    const groupID: string = req.params['id'];
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
+    const groupID: string = req.params.id;
     const requesterID = getRequesterIdFromRequest(req);
-    const userToAdd: string = req.params['userID'];
-    const userRole: UserRole = req.body['role'];
+    const userToAdd: string = req.params.userID;
+    const userRole: UserRole = req.body.role;
 
     await UpdateUserRole.logic(groupID, userToAdd, userRole, requesterID);
     res.sendStatus(204);
@@ -55,8 +52,8 @@ export default class UpdateUserRole extends Endpoint {
     groupID: string,
     userID: string,
     userRole = UserRole.Member,
-    requesterID: string): Promise<void> {
-
+    requesterID: string,
+  ): Promise<void> {
     const oldRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
     if (oldRole === null) {
       throw new UserIsNotInGroup(userID, groupID);
@@ -72,7 +69,5 @@ export default class UpdateUserRole extends Endpoint {
     if (!res) {
       throw new Unexpected(`Unexpected error when updating user ${userID} role ${userRole} to group ${groupID}`);
     }
-
-    return;
   }
 }

@@ -1,11 +1,11 @@
-import { ObjectID } from 'mongodb';
 import { IGroup, IGroupPrimal, GroupType } from './group.interface';
-import { groupModel } from './group.model';
+import groupModel from './group.model';
 import { UserRole } from './user/user.role';
 
 /**
  * The repository connects the group-service with the mongo DB.
- * It is the 'lowest' level of code before making changes in the database or retrieving information from it.
+ * It is the 'lowest' level of code before making changes in the database or
+ * retrieving information from it.
  */
 export default class GroupRepository {
   /**
@@ -104,7 +104,8 @@ export default class GroupRepository {
   static async addUser(groupID: string, userID: string, role: UserRole): Promise<boolean> {
     const res = await groupModel.updateOne(
       { _id: groupID, 'users.id': { $ne: userID } },
-      { $push: { users: { role, id: userID } } }).exec();
+      { $push: { users: { role, id: userID } } },
+    ).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
@@ -141,7 +142,8 @@ export default class GroupRepository {
             id: userID,
           },
         },
-      }).exec();
+      },
+    ).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
@@ -154,10 +156,8 @@ export default class GroupRepository {
   * - The group does not even exist
   */
   static async getUserRoleFromGroup(groupID: string, userID: string): Promise<UserRole | null> {
-
     const group = await groupModel
-      .findOne({ _id: groupID, 'users.id': userID }, { 'users.$': 1 })
-      .exec();
+      .findOne({ _id: groupID, 'users.id': userID }, { 'users.$': 1 }).exec();
 
     if (!group?.users) {
       return null;
@@ -176,7 +176,8 @@ export default class GroupRepository {
   static async addTag(groupID: string, label: string): Promise<boolean> {
     const res = await groupModel.updateOne(
       { _id: groupID },
-      { $addToSet: { tags: { label } } }).exec();
+      { $addToSet: { tags: { label } } },
+    ).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 
@@ -191,7 +192,8 @@ export default class GroupRepository {
     const label = tag.toLowerCase();
     const res = await groupModel.updateOne(
       { _id: groupID },
-      { $pull: { tags: { label } } }).exec();
+      { $pull: { tags: { label } } },
+    ).exec();
     return res.n === 1 && res.nModified === 1 && res.ok === 1;
   }
 }

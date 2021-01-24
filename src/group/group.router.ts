@@ -15,6 +15,7 @@ import GetUsersOfGroup from './user/endpoints/group.user.get';
 import RemoveUserFromGroup from './user/endpoints/group.user.remove';
 import UpdateUserRole from './user/endpoints/group.user.update';
 
+/* eslint no-multi-spaces: "off" */
 export default createFeatureRouter(
   new GetGroupByID(),         // GET    /:id
   new GetGroupByUserID(),     // GET    /users/:id

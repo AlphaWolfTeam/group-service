@@ -43,4 +43,5 @@ const groupSchema = new Schema(
   },
 );
 
-export const groupModel = model<IGroup & Document>('Group', groupSchema);
+const groupModel = model<IGroup & Document>('Group', groupSchema);
+export default groupModel;

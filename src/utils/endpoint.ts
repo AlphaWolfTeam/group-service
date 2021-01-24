@@ -5,12 +5,23 @@ import { InvalidArgument } from './errors/client.error';
 import ValidateRequest from './joi';
 import { wrapController } from './wrappers';
 
-export default abstract class Endpoint {
+export enum HttpRequestType {
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  PATCH = 'patch',
+  DELETE = 'delete',
+}
 
+export default abstract class Endpoint {
   path: string;
+
   requestType: HttpRequestType;
+
   requestSchema: Joi.ObjectSchema;
+
   validateRequest = ValidateRequest;
+
   wrapController = wrapController;
 
   constructor(requestType:HttpRequestType, path: string) {
@@ -25,7 +36,7 @@ export default abstract class Endpoint {
       this.path,
       this.validateRequest(this.requestSchema),
       this.wrapController(this.requestHandler),
-      (req, res) => { console.log('Can you here me?'); },
+      () => { console.log('Can you here me?'); },
     );
     return router;
   }
@@ -33,7 +44,6 @@ export default abstract class Endpoint {
   abstract requestHandler(req: Request, res: Response): Promise<void>;
 
   abstract createRequestSchema(): Joi.ObjectSchema;
-
 }
 
 export function createFeatureRouter(...endpoints: Endpoint[]): Router {
@@ -42,14 +52,6 @@ export function createFeatureRouter(...endpoints: Endpoint[]): Router {
     featureRouter.use(endpoint.createExpressRouter());
   });
   return featureRouter;
-}
-
-export enum HttpRequestType {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
 }
 
 /**
@@ -61,7 +63,7 @@ export enum HttpRequestType {
 export function getRequesterIdFromRequest(req: Request): string {
   const id = req.header(config.userHeader);
 
-  if (typeof(id) !== 'string') {
+  if (typeof (id) !== 'string') {
     // Should never happen if the function already have a validation on this parameter.
     throw new InvalidArgument(`requester ID should be sent in the ${config.userHeader} header`);
   }

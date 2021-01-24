@@ -1,7 +1,8 @@
 import * as express from 'express';
 import { ClientError } from './application.error';
 
-export default (error: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+export default (error: Error, _req: express.Request,
+  res: express.Response, next: express.NextFunction) => {
   if (error.name === 'ValidationError') {
     res.status(400).send({
       type: error.name,

@@ -1,6 +1,8 @@
 import { UserRole } from './user.role';
 
-export default interface User {
+interface User {
   id: string;
   role: UserRole;
 }
+
+export default User;

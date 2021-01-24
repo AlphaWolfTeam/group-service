@@ -1,8 +1,10 @@
- /**
+/**
  * ApplicationError is an Error class.
 */
+/* eslint max-classes-per-file: ["error", 3] */
 export class ApplicationError extends Error {
   public code: number;
+
   public name: string;
 
   constructor(message?: string, code?: number) {
@@ -16,7 +18,6 @@ export class ApplicationError extends Error {
   get status() {
     return this.code;
   }
-
 }
 
 export class ServerError extends ApplicationError {

@@ -19,7 +19,14 @@ describe('Group Service', () => {
   const app = new Server('8000', 'test').app;
 
   beforeAll(async () => {
-    await mongoose.connect(config.mongo.uri, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
+    await mongoose.connect(
+      config.mongo.uri,
+      { useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true 
+      }
+    );
     await mongoose.connection.db.dropDatabase();
   });
 

@@ -8,10 +8,12 @@ const initializeMongo = async () => {
   await mongoose.connect(
     config.mongo.uri,
     {
-      useNewUrlParser: true, useUnifiedTopology: true,
-      useFindAndModify: false, useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
     },
-    )
+  )
     .catch((err) => {
       console.log('Unable to connect to the mongo. Please start the server. Error: ', err);
       process.exit(1);

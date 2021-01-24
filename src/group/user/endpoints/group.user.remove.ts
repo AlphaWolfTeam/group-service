@@ -3,34 +3,31 @@ import * as Joi from 'joi';
 import config from '../../../config';
 import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
 import { UserIsNotInGroup } from '../../../utils/errors/client.error';
-import { Unexpected } from '../../../utils/errors/server.error';
+import Unexpected from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
 import { requiredRole, UserRole } from '../user.role';
 
 export default class RemoveUserFromGroup extends Endpoint {
-
   constructor() {
     super(HttpRequestType.DELETE, '/:id/users/:userID');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      params: {
-        id: Joi.string().custom(validateObjectID).required(),
-        userID: Joi.string().custom(validateObjectID).required(),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    params: {
+      id: Joi.string().custom(validateObjectID).required(),
+      userID: Joi.string().custom(validateObjectID).required(),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  });
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
-    const groupID: string = req.params['id'];
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
+    const groupID: string = req.params.id;
     const requesterID = getRequesterIdFromRequest(req);
-    const userToRemove: string = req.params['userID'];
+    const userToRemove: string = req.params.userID;
 
     const deletedUserID = await RemoveUserFromGroup.logic(groupID, userToRemove, requesterID);
     res.status(200).json(deletedUserID);
@@ -49,8 +46,8 @@ export default class RemoveUserFromGroup extends Endpoint {
   static async logic(
     groupID: string,
     userID: string,
-    requesterID: string): Promise<string> {
-
+    requesterID: string,
+  ): Promise<string> {
     const userRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
     if (userRole === null) {
       throw new UserIsNotInGroup(userID, groupID);
@@ -62,7 +59,7 @@ export default class RemoveUserFromGroup extends Endpoint {
         requesterID,
         requiredRole.user.delete(userRole),
         `remove the user ${userID} with the role ${UserRole[userRole]} from the group ${groupID}.`,
-        );
+      );
     }
 
     const res = await GroupRepository.removeUser(groupID, userID);

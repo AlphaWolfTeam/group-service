@@ -11,24 +11,21 @@ import User from '../user/user.interface';
 import { requiredRole } from '../user/user.role';
 
 export default class DeleteGroup extends Endpoint {
-
   constructor() {
     super(HttpRequestType.DELETE, '/:id');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      params: {
-        id: Joi.string().custom(validateObjectID).required(),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    params: {
+      id: Joi.string().custom(validateObjectID).required(),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  })
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
-    const groupID: string = req.params['id'];
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
+    const groupID: string = req.params.id;
     const requesterID: string = getRequesterIdFromRequest(req);
 
     const result = await DeleteGroup.logic(groupID, requesterID);
@@ -47,6 +44,7 @@ export default class DeleteGroup extends Endpoint {
    */
   static async logic(id: string, requesterID: User['id']): Promise<IGroup | null> {
     await GroupFunctions.verifyUserHasRequiredRole(id, requesterID, requiredRole.delete, `delete the group ${id}`);
-    return await GroupRepository.deleteById(id);
+    const res = await GroupRepository.deleteById(id);
+    return res;
   }
 }

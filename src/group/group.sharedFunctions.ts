@@ -1,10 +1,9 @@
-import { GroupNotFound, UserCannotPreformActionOnGroup, UserIsNotInGroup } from '../utils/errors/client.error';
+import { GroupNotFound, UserCannotPreformActionOnGroup } from '../utils/errors/client.error';
 import GroupRepository from './group.repository';
 import { IGroup } from './group.interface';
 import { UserRole, isRoleSufficient } from './user/user.role';
 
 export default class GroupFunctions {
-
   /**
    * Checks if a user is in a group.
    * @param groupID - the ID of the group.
@@ -31,8 +30,8 @@ export default class GroupFunctions {
     groupID: string,
     userID: string,
     requiredRole: UserRole,
-    actionDescription?: string): Promise<void> {
-
+    actionDescription?: string,
+  ): Promise<void> {
     const usersRole = await GroupRepository.getUserRoleFromGroup(groupID, userID);
 
     if (usersRole === null) {
@@ -51,5 +50,4 @@ export default class GroupFunctions {
       );
     }
   }
-
 }

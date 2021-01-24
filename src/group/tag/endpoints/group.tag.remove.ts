@@ -2,34 +2,31 @@ import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import config from '../../../config';
 import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../../utils/endpoint';
-import { Unexpected } from '../../../utils/errors/server.error';
+import Unexpected from '../../../utils/errors/server.error';
 import { validateObjectID } from '../../../utils/joi';
 import GroupRepository from '../../group.repository';
 import GroupFunctions from '../../group.sharedFunctions';
 import { requiredRole } from '../../user/user.role';
 
 export default class RemoveTagFromGroup extends Endpoint {
-
   constructor() {
     super(HttpRequestType.DELETE, '/:id/tags/:label');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      params: {
-        id: Joi.string().custom(validateObjectID).required(),
-        label: Joi.string().min(config.tagLengthMin).required(),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    params: {
+      id: Joi.string().custom(validateObjectID).required(),
+      label: Joi.string().min(config.tagLengthMin).required(),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  });
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
-    const groupID: string = req.params['id'];
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
+    const groupID: string = req.params.id;
     const requesterID = getRequesterIdFromRequest(req);
-    const tag: string = req.params['label'];
+    const tag: string = req.params.label;
 
     await RemoveTagFromGroup.logic(groupID, tag, requesterID);
     res.sendStatus(204);
@@ -47,14 +44,14 @@ export default class RemoveTagFromGroup extends Endpoint {
   static async logic(
     groupID: string,
     tag: string,
-    requesterID: string): Promise<void> {
-
+    requesterID: string,
+  ): Promise<void> {
     await GroupFunctions.verifyUserHasRequiredRole(
       groupID,
       requesterID,
       requiredRole.tag,
       `remove a tag from the group ${groupID}.`,
-      );
+    );
 
     const res = await GroupRepository.removeTag(groupID, tag);
     if (!res) {

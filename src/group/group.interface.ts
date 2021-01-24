@@ -1,5 +1,11 @@
 import User from './user/user.interface';
 
+export enum GroupType {
+  Private = 'private',
+  Public = 'public',
+  // Technical = 'technical',
+}
+
 export interface IGroupPrimal {
   name: string;
   description: string;
@@ -15,10 +21,4 @@ export interface IGroup extends IGroupPrimal {
   exchangeAddress?: string;
   createdAt?: Date;
   updatedAt?: Date;
-}
-
-export enum GroupType {
-  Private = 'private',
-  Public = 'public',
-  // Technical = 'technical',
 }

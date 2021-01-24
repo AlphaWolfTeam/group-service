@@ -10,30 +10,34 @@ import GroupFunctions from '../group.sharedFunctions';
 import User from '../user/user.interface';
 import { requiredRole } from '../user/user.role';
 
-export default class UpdateGroup extends Endpoint {
+/**
+ * filter out the fields with a undefined value from the object , and returns the new object.
+ * @param obj - the object to filter the undefined values from
+ */
+const filterOutUndefinedFromGroup = <T extends Object>(obj: T,
+): Partial<T> => pickBy(obj, (v) => v !== undefined);
 
+export default class UpdateGroup extends Endpoint {
   constructor() {
     super(HttpRequestType.PATCH, '/:id');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      body: {
-        name: Joi.string(),
-        description: Joi.string(),
-        type: Joi.string().valid(...Object.values(GroupType)),
-      },
-      params: {
-        id: Joi.string().custom(validateObjectID).required(),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    body: {
+      name: Joi.string(),
+      description: Joi.string(),
+      type: Joi.string().valid(...Object.values(GroupType)),
+    },
+    params: {
+      id: Joi.string().custom(validateObjectID).required(),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  });
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
-    const groupID: string = req.params['id'];
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
+    const groupID: string = req.params.id;
     const requesterID = getRequesterIdFromRequest(req);
 
     let partialGroup: Partial<IGroup> = {
@@ -62,11 +66,3 @@ export default class UpdateGroup extends Endpoint {
     return GroupRepository.updateById(id, partialGroup);
   }
 }
-
-/**
- * filter out the fields with a undefined value from the object , and returns the new object.
- * @param obj - the object to filter the undefined values from
- */
-const filterOutUndefinedFromGroup = <T extends Object>(obj: T): Partial<T> => {
-  return pickBy(obj, v => v !== undefined);
-};

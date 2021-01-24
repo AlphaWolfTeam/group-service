@@ -7,25 +7,22 @@ import GroupRepository from '../group.repository';
 import { UserRole } from '../user/user.role';
 
 export default class CreateGroup extends Endpoint {
-
   constructor() {
     super(HttpRequestType.POST, '/');
   }
 
-  createRequestSchema(): Joi.ObjectSchema {
-    return Joi.object({
-      body: {
-        name: Joi.string().required(),
-        description: Joi.string().required(),
-        type: Joi.string().valid(...Object.values(GroupType)),
-      },
-      headers: {
-        [config.userHeader]: Joi.string().required(),
-      },
-    });
-  }
+  createRequestSchema = (): Joi.ObjectSchema => Joi.object({
+    body: {
+      name: Joi.string().required(),
+      description: Joi.string().required(),
+      type: Joi.string().valid(...Object.values(GroupType)),
+    },
+    headers: {
+      [config.userHeader]: Joi.string().required(),
+    },
+  })
 
-  async requestHandler(req: Request, res: Response): Promise<void> {
+  requestHandler = async (req: Request, res: Response): Promise<void> => {
     const group: IGroupPrimal = CreateGroup.extractAndTransform(req);
     const createdGroup: IGroupPrimal = await CreateGroup.logic(group);
     res.status(201).json(createdGroup);

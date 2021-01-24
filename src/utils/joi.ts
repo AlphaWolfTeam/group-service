@@ -1,8 +1,8 @@
 import { Request } from 'express';
 import * as Joi from 'joi';
+import * as mongoose from 'mongoose';
 import { wrapValidator } from './wrappers';
 import { InvalidArgument, NotAnObjectID } from './errors/client.error';
-import * as mongoose from 'mongoose';
 
 const defaultValidationOptions: Joi.ValidationOptions = {
   abortEarly: false, // returns all the errors found.
@@ -20,7 +20,8 @@ const normalizeRequest = (req: any, value: any) => {
   req.params = value.params;
 };
 
-const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationOptions = defaultValidationOptions) => {
+const ValidateRequest = (schema: Joi.ObjectSchema<any>,
+  options: Joi.ValidationOptions = defaultValidationOptions) => {
   const validator = async (req: Request) => {
     const { error, value } = schema.validate(req, options);
     if (error) {

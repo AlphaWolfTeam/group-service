@@ -1,5 +1,7 @@
 import { ClientError } from './application.error';
 
+/* eslint max-classes-per-file: ["error", 9] */
+
 export class ResourceNotFound extends ClientError {
   constructor(message?: string) {
     super(message || 'resource not found', 404);
