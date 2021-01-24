@@ -1,0 +1,45 @@
+import { Request } from 'express';
+import * as Joi from 'joi';
+import { wrapValidator } from './wrappers';
+import { InvalidArgument, NotAnObjectID } from './errors/client.error';
+import * as mongoose from 'mongoose';
+
+const defaultValidationOptions: Joi.ValidationOptions = {
+  abortEarly: false, // returns all the errors found.
+  allowUnknown: true,
+};
+
+const normalizeRequest = (req: any, value: any) => {
+  req.originalBody = req.body;
+  req.body = value.body;
+
+  req.originalQuery = req.query;
+  req.query = value.query;
+
+  req.originalParams = req.params;
+  req.params = value.params;
+};
+
+const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationOptions = defaultValidationOptions) => {
+  const validator = async (req: Request) => {
+    const { error, value } = schema.validate(req, options);
+    if (error) {
+      throw new InvalidArgument(error.message);
+    }
+
+    if (options.convert) {
+      normalizeRequest(req, value);
+    }
+  };
+
+  return wrapValidator(validator);
+};
+
+export const validateObjectID = (value: any) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    throw new NotAnObjectID(value);
+  }
+  return value;
+};
+
+export default ValidateRequest;
