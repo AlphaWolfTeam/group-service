@@ -1,5 +1,7 @@
 # Group Service
 
+![CI Tests](https://github.com/alphawolfteam/group-service/workflows/CI%20Tests/badge.svg)
+
   A service that provides a REST API for CRUD operations on groups.
   
   The service should be connected to a mongodb in order to run.

@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+
+  group-service-test:
+    image: friends-group-service:test
+    depends_on:
+      - mongo
+    environment:
+      PORT: 8000
+      MONGO_URI: mongodb://mongo:27017/devDB
+      MONGO_FEATURE_COLLECTION_NAME: groups
+      USER_HEADER: X-User-ID
+    ports:
+      - 8080:8000
+
+  mongo:
+    image: "mongo:4.0.9"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./data/db:/data/db"
