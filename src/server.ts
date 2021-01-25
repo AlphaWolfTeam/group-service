@@ -49,7 +49,6 @@ export default class Server {
       active: config.apm.isActive === 'true',
       environment: config.service.environment,
     });
-    if (apmAgent.isStarted()) console.log('APM Agent started');
   }
 
   // configureErrorHandlers
