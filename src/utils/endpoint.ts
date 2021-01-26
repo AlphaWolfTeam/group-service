@@ -23,9 +23,8 @@ export default abstract class Endpoint {
     const router: Router = Router();
     router[this.requestType](
       this.path,
-      this.validateRequest(this.requestSchema),
-      this.wrapController(this.requestHandler),
-      (req, res) => { console.log('Can you here me?'); },
+      this.validateRequest((<any>this).constructor.name, this.requestSchema),
+      this.wrapController(this.requestHandler, (<any>this).constructor.name),
     );
     return router;
   }

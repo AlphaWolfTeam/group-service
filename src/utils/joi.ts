@@ -20,7 +20,7 @@ const normalizeRequest = (req: any, value: any) => {
   req.params = value.params;
 };
 
-const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationOptions = defaultValidationOptions) => {
+const ValidateRequest = (functionName: string, schema: Joi.ObjectSchema<any>, options: Joi.ValidationOptions = defaultValidationOptions) => {
   const validator = async (req: Request) => {
     const { error, value } = schema.validate(req, options);
     if (error) {
@@ -32,7 +32,7 @@ const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationO
     }
   };
 
-  return wrapValidator(validator);
+  return wrapValidator(validator, functionName);
 };
 
 export const validateObjectID = (value: any) => {
