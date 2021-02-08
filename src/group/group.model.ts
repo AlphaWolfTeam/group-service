@@ -12,9 +12,11 @@ const groupSchema = new Schema(
     },
     description: {
       type: String,
+      required: true,
     },
     icon: {
       type: String,
+      required: true,
     },
     tags: {
       _id: false,
@@ -39,7 +41,6 @@ const groupSchema = new Schema(
       type: String,
       required: true,
     },
-    icon: {}, // Not Implemented
   },
   {
     timestamps: true,

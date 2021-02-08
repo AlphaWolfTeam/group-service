@@ -16,8 +16,8 @@ export default class CreateGroup extends Endpoint {
     return Joi.object({
       body: {
         name: Joi.string().required(),
-        description: Joi.string().required(), // in the group.model this is not requried
-        icon: Joi.string().base64(),
+        description: Joi.string().required(),
+        icon: Joi.string().base64().required(),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
       headers: {
