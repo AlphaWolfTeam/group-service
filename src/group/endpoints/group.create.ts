@@ -18,7 +18,7 @@ export default class CreateGroup extends Endpoint {
         name: Joi.string().required(),
         description: Joi.string().required(),
         type: Joi.string().valid(...Object.values(GroupType)),
-        icon: Joi.string().base64(),
+        icon: Joi.binary().encoding('base64'),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),

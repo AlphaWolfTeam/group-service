@@ -21,7 +21,7 @@ export default class UpdateGroup extends Endpoint {
       body: {
         name: Joi.string(),
         description: Joi.string(),
-        icon: Joi.string().base64(),
+        icon: Joi.binary().encoding('base64'),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
       params: {
