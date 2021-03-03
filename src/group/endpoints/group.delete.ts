@@ -7,7 +7,7 @@ import { validateObjectID } from '../../utils/joi';
 import { IGroup } from '../group.interface';
 import GroupRepository from '../group.repository';
 import GroupFunctions from '../group.sharedFunctions';
-import User from '../user/user.interface';
+import IUser from '../user/user.interface';
 import { requiredRole } from '../user/user.role';
 
 export default class DeleteGroup extends Endpoint {
@@ -45,7 +45,7 @@ export default class DeleteGroup extends Endpoint {
    * @param requesterID - The user ID of the requester.
    * @returns wether the group was modified correctly or not.
    */
-  static async logic(id: string, requesterID: User['id']): Promise<IGroup | null> {
+  static async logic(id: string, requesterID: IUser['id']): Promise<IGroup | null> {
     await GroupFunctions.verifyUserHasRequiredRole(id, requesterID, requiredRole.delete, `delete the group ${id}`);
     return await GroupRepository.deleteById(id);
   }

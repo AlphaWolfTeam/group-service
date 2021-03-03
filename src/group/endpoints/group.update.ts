@@ -7,7 +7,7 @@ import { validateObjectID } from '../../utils/joi';
 import { GroupType, IGroup } from '../group.interface';
 import GroupRepository from '../group.repository';
 import GroupFunctions from '../group.sharedFunctions';
-import User from '../user/user.interface';
+import IUser from '../user/user.interface';
 import { requiredRole } from '../user/user.role';
 
 export default class UpdateGroup extends Endpoint {
@@ -57,7 +57,7 @@ export default class UpdateGroup extends Endpoint {
    * @param requesterID - The user ID of the requester.
    * @returns wether the group was modified correctly or not.
    */
-  static async logic(id: string, partialGroup: Partial<IGroup>, requesterID: User['id']): Promise<IGroup> {
+  static async logic(id: string, partialGroup: Partial<IGroup>, requesterID: IUser['id']): Promise<IGroup> {
     await GroupFunctions.verifyUserHasRequiredRole(id, requesterID, requiredRole.update, `update group ${id} fields.`);
     return GroupRepository.updateById(id, partialGroup);
   }

@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
 import * as Joi from 'joi';
 import config from '../../config';
-import Endpoint, { getRequesterIdFromRequest, HttpRequestType } from '../../utils/endpoint';
+import Endpoint, {
+  getRequesterIdFromRequest,
+  HttpRequestType,
+} from '../../utils/endpoint';
 import { GroupType, IGroup, IGroupPrimal } from '../group.interface';
+import IUser from '../user/user.interface';
 import GroupRepository from '../group.repository';
-import { UserRole } from '../user/user.role';
+import { UserRole, USER_ROLES_NUM } from '../user/user.role';
+import { validateObjectID } from '../../utils/joi';
 
 export default class CreateGroup extends Endpoint {
-
   constructor() {
     super(HttpRequestType.POST, '/');
   }
@@ -17,7 +21,16 @@ export default class CreateGroup extends Endpoint {
       body: {
         name: Joi.string().required(),
         description: Joi.string().required(),
+        users: Joi.array()
+          .items({
+            id: Joi.string().custom(validateObjectID).required(),
+            role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
+          })
+          .required(),
         type: Joi.string().valid(...Object.values(GroupType)),
+        tags: Joi.array().items({
+          label: Joi.string().required(),
+        }).unique(),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -41,8 +54,8 @@ export default class CreateGroup extends Endpoint {
     return {
       name: req.body.name,
       description: req.body.description,
-      users: [{ id: requesterID, role: UserRole.Admin }],
-      tags: req.body.tags,
+      users: setRequester(req.body.users, requesterID),
+      tags: req.body.tags || [],
       type: req.body.type || GroupType.Public,
       modifiedBy: requesterID,
       createdBy: requesterID,
@@ -50,8 +63,8 @@ export default class CreateGroup extends Endpoint {
   }
 
   /**
-   * creates a new group
-   * @param group - the group to add to the DB
+   * creates a new group.
+   * @param group - the group to add to the DB.
    * @returns the new created group.
    */
   static async logic(group: IGroupPrimal): Promise<IGroup> {
@@ -59,3 +72,15 @@ export default class CreateGroup extends Endpoint {
     return createdGroup;
   }
 }
+
+/**
+ * sets the requester as a manager in the users array.
+ * @param users - An array of users.
+ * @param requesterId - An id of the requester.
+ * @returns an array of users with requester.
+ */
+const setRequester = (users: IUser[], requesterId: string): IUser[] => {
+  return users.some((user: IUser) => user.id === requesterId)
+    ? users.map((user: IUser) => user.id === requesterId ? { id: requesterId, role: UserRole.Admin } : user)
+    : [...users, { id: requesterId, role: UserRole.Admin }];
+};

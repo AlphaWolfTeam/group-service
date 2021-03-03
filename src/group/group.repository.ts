@@ -1,4 +1,3 @@
-import { ObjectID } from 'mongodb';
 import { IGroup, IGroupPrimal, GroupType } from './group.interface';
 import { groupModel } from './group.model';
 import { UserRole } from './user/user.role';
