@@ -25,8 +25,7 @@ export default class CreateGroup extends Endpoint {
           .items({
             id: Joi.string().custom(validateObjectID).required(),
             role: Joi.number().min(0).max(USER_ROLES_NUM).required(),
-          })
-          .required(),
+          }),
         type: Joi.string().valid(...Object.values(GroupType)),
         tags: Joi.array().items({
           label: Joi.string().required(),
@@ -54,7 +53,7 @@ export default class CreateGroup extends Endpoint {
     return {
       name: req.body.name,
       description: req.body.description,
-      users: setRequester(req.body.users, requesterID),
+      users: setRequester(req.body.users || [], requesterID),
       tags: req.body.tags || [],
       type: req.body.type || GroupType.Public,
       modifiedBy: requesterID,
