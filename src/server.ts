@@ -30,7 +30,7 @@ export default class Server {
       this.app.use(logger('tiny'));
     }
     this.app.use(helmet());
-    this.app.use(bodyParser.json({ limit: '100mb' }));
+    this.app.use(bodyParser.json({ limit: '5mb' }));
     this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
