@@ -21,6 +21,7 @@ export default class UpdateGroup extends Endpoint {
       body: {
         name: Joi.string(),
         description: Joi.string(),
+        icon: Joi.binary().encoding('base64'),
         type: Joi.string().valid(...Object.values(GroupType)),
       },
       params: {
@@ -39,6 +40,7 @@ export default class UpdateGroup extends Endpoint {
     let partialGroup: Partial<IGroup> = {
       name: req.body.name,
       description: req.body.description,
+      icon: req.body.icon,
       type: req.body.type,
       modifiedBy: requesterID,
     };

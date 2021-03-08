@@ -18,6 +18,7 @@ export default class CreateGroup extends Endpoint {
         name: Joi.string().required(),
         description: Joi.string().required(),
         type: Joi.string().valid(...Object.values(GroupType)),
+        icon: Joi.binary().encoding('base64'),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -41,6 +42,7 @@ export default class CreateGroup extends Endpoint {
     return {
       name: req.body.name,
       description: req.body.description,
+      icon: req.body.icon,
       users: [{ id: requesterID, role: UserRole.Admin }],
       tags: req.body.tags,
       type: req.body.type || GroupType.Public,
