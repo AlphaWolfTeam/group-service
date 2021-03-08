@@ -194,8 +194,8 @@ describe('Group Service', () => {
         name: 'group',
         description: 'a group',
         type: GroupType.Private,
-        tags: [{label: 'label'}],
-        users: [{id: USER_ID, role: UserRole.Admin}],
+        tags: [{ label: 'label' }],
+        users: [{ id: USER_ID, role: UserRole.Admin }],
         icon: 'icon',
       };
 
@@ -304,7 +304,7 @@ describe('Group Service', () => {
         .send({
           name: 'group',
           description: 'a group',
-          tags: [{label: 'tag'}, {label: 'tag'}]
+          tags: [{ label: 'tag' }, { label: 'tag' }],
         }).set({ [config.userHeader]: USER_ID });
 
       expect(res.status).toEqual(400);
