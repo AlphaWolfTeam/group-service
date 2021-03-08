@@ -238,7 +238,7 @@ describe('Group Service', () => {
       expect(group).toHaveProperty('type', GroupType.Public);
     });
 
-    test('should create set the requester as a manager', async () => {
+    test('should set the requester as a manager', async () => {
       const partialGroup: Partial<IGroup> = {
         name: 'group',
         description: 'a group',
