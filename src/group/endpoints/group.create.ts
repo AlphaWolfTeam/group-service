@@ -54,7 +54,7 @@ export default class CreateGroup extends Endpoint {
     return {
       name: req.body.name,
       description: req.body.description,
-      users: setRequester(req.body.users || [], requesterID),
+      users: addRequesterAsAdmin(req.body.users || [], requesterID),
       tags: req.body.tags || [],
       icon: req.body.icon,
       type: req.body.type || GroupType.Public,
