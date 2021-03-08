@@ -30,6 +30,7 @@ export default class CreateGroup extends Endpoint {
         tags: Joi.array().items({
           label: Joi.string().required(),
         }).unique(),
+        icon: Joi.binary().encoding('base64'),
       },
       headers: {
         [config.userHeader]: Joi.string().required(),
@@ -55,6 +56,7 @@ export default class CreateGroup extends Endpoint {
       description: req.body.description,
       users: setRequester(req.body.users || [], requesterID),
       tags: req.body.tags || [],
+      icon: req.body.icon,
       type: req.body.type || GroupType.Public,
       modifiedBy: requesterID,
       createdBy: requesterID,

@@ -194,8 +194,12 @@ describe('Group Service', () => {
         name: 'group',
         description: 'a group',
         type: GroupType.Private,
+<<<<<<< HEAD
         tags: [{label: 'label'}],
         users: [{id: USER_ID, role: UserRole.Admin}],
+=======
+        icon: 'icon',
+>>>>>>> 3df72ba209df03414aba69f4ad4628c17b028134
       };
 
       const res = await request(app)
@@ -212,6 +216,7 @@ describe('Group Service', () => {
       expect(group).toHaveProperty('tags', partialGroup.tags);
       expect(group).toHaveProperty('users', partialGroup.users);
       expect(group).toHaveProperty('type', partialGroup.type);
+      expect(group).toHaveProperty('icon', partialGroup.icon);
       expect(group).toHaveProperty('modifiedBy', USER_ID);
       expect(group).toHaveProperty('createdBy', USER_ID);
 
@@ -385,6 +390,7 @@ describe('Group Service', () => {
       const partialGroup: Partial<IGroup> = {
         name: 'updated group',
         description: 'an updated group',
+        icon: 'updatedicon',
         type: GroupType.Private,
       };
 
@@ -402,6 +408,7 @@ describe('Group Service', () => {
       const partialGroup: Partial<IGroup> = {
         name: 'updated group',
         description: 'an updated group',
+        icon: 'updatedicon',
         type: GroupType.Private,
       };
 
@@ -417,6 +424,7 @@ describe('Group Service', () => {
       expect(updatedGroup).toHaveProperty('name', partialGroup.name);
       expect(updatedGroup).toHaveProperty('description', partialGroup.description);
       expect(updatedGroup).toHaveProperty('type', partialGroup.type);
+      expect(updatedGroup).toHaveProperty('icon', partialGroup.icon);
       expect(updatedGroup).toHaveProperty('modifiedBy', USER_ID);
       expect(updatedGroup).toHaveProperty('createdBy', USER_ID);
 
@@ -441,6 +449,32 @@ describe('Group Service', () => {
       expect(updatedGroup).toHaveProperty('name', partialGroup.name);
       expect(updatedGroup).toHaveProperty('description', group.description);
       expect(updatedGroup).toHaveProperty('type', group.type);
+      expect(updatedGroup).toHaveProperty('icon', group.icon);
+      expect(updatedGroup).toHaveProperty('modifiedBy', USER_ID);
+      expect(updatedGroup).toHaveProperty('createdBy', USER_ID);
+
+    });
+
+    test('should update just the icon of a group', async () => {
+      const group = await createGroupHelper();
+
+      const partialGroup: Partial<IGroup> = {
+        icon: 'anothericon',
+      };
+
+      const res = await request(app)
+        .patch(`/${group._id}`)
+        .send(partialGroup)
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(200);
+
+      const updatedGroup: IGroup = res.body;
+      expect(updatedGroup).toHaveProperty('_id');
+      expect(updatedGroup).toHaveProperty('name', group.name);
+      expect(updatedGroup).toHaveProperty('description', group.description);
+      expect(updatedGroup).toHaveProperty('type', group.type);
+      expect(updatedGroup).toHaveProperty('icon', partialGroup.icon);
       expect(updatedGroup).toHaveProperty('modifiedBy', USER_ID);
       expect(updatedGroup).toHaveProperty('createdBy', USER_ID);
 
@@ -1061,6 +1095,7 @@ const createGroupHelper = async (
   const group: IGroupPrimal = {
     name: name || 'group',
     description: 'a group',
+    icon: 'icon',
     type: type || GroupType.Public,
     tags: tags ? tags.map((label) => { return { label }; }) : [],
     users: [{

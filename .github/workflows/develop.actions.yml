@@ -54,3 +54,11 @@ jobs:
         
     - name: Push image
       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:develop
+    
+    - name: Update azure vm
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.AZURE_HOST }}
+        username: ${{ secrets.AZURE_USERNAME }}
+        password: ${{ secrets.AZURE_PASSWORD }}
+        script: sh update-service.sh
