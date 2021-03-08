@@ -194,7 +194,12 @@ describe('Group Service', () => {
         name: 'group',
         description: 'a group',
         type: GroupType.Private,
+<<<<<<< HEAD
+        tags: [{label: 'label'}],
+        users: [{id: USER_ID, role: UserRole.Admin}],
+=======
         icon: 'icon',
+>>>>>>> 3df72ba209df03414aba69f4ad4628c17b028134
       };
 
       const res = await request(app)
@@ -208,6 +213,8 @@ describe('Group Service', () => {
       expect(group).toHaveProperty('_id');
       expect(group).toHaveProperty('name', partialGroup.name);
       expect(group).toHaveProperty('description', partialGroup.description);
+      expect(group).toHaveProperty('tags', partialGroup.tags);
+      expect(group).toHaveProperty('users', partialGroup.users);
       expect(group).toHaveProperty('type', partialGroup.type);
       expect(group).toHaveProperty('icon', partialGroup.icon);
       expect(group).toHaveProperty('modifiedBy', USER_ID);
@@ -234,6 +241,23 @@ describe('Group Service', () => {
 
       const group: IGroup = res.body;
       expect(group).toHaveProperty('type', GroupType.Public);
+    });
+
+    test('should set the requester as a manager', async () => {
+      const partialGroup: Partial<IGroup> = {
+        name: 'group',
+        description: 'a group',
+        users: [{ id: USER_ID, role: UserRole.Member }],
+      };
+      const res = await request(app)
+        .post('/')
+        .send(partialGroup)
+        .set({ [config.userHeader]: USER_ID });
+
+      expect(res.status).toEqual(201);
+
+      const group: IGroup = res.body;
+      expect(group).toHaveProperty('users', [{ id: USER_ID, role: UserRole.Admin }]);
     });
 
     test('should throw a validation error if some of the required fields are lacking', async () => {
@@ -273,6 +297,18 @@ describe('Group Service', () => {
           name: 'group',
           description: 'a group',
         });
+
+      expect(res.status).toEqual(400);
+    });
+
+    test('should throw a validation error if a tag is repeated', async () => {
+      const res = await request(app)
+        .post('/')
+        .send({
+          name: 'group',
+          description: 'a group',
+          tags: [{label: 'tag'}, {label: 'tag'}]
+        }).set({ [config.userHeader]: USER_ID });
 
       expect(res.status).toEqual(400);
     });

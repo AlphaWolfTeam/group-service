@@ -1,4 +1,4 @@
-import User from './user/user.interface';
+import IUser from './user/user.interface';
 
 export interface IGroupPrimal {
   name: string;
@@ -6,9 +6,9 @@ export interface IGroupPrimal {
   icon: string;
   type: GroupType;
   tags: { label: string }[];
-  users: User[];
-  modifiedBy: User['id'];
-  createdBy: User['id'];
+  users: IUser[];
+  modifiedBy: IUser['id'];
+  createdBy: IUser['id'];
 }
 
 export interface IGroup extends IGroupPrimal {
