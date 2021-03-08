@@ -194,12 +194,9 @@ describe('Group Service', () => {
         name: 'group',
         description: 'a group',
         type: GroupType.Private,
-<<<<<<< HEAD
         tags: [{label: 'label'}],
         users: [{id: USER_ID, role: UserRole.Admin}],
-=======
         icon: 'icon',
->>>>>>> 3df72ba209df03414aba69f4ad4628c17b028134
       };
 
       const res = await request(app)
