@@ -80,7 +80,7 @@ export default class CreateGroup extends Endpoint {
  * @param requesterId - An id of the requester.
  * @returns an array of users with requester.
  */
-const setRequester = (users: IUser[], requesterId: string): IUser[] => {
+const addRequesterAsAdmin = (users: IUser[], requesterId: string): IUser[] => {
   return users.some((user: IUser) => user.id === requesterId)
     ? users.map((user: IUser) => user.id === requesterId ? { id: requesterId, role: UserRole.Admin } : user)
     : [...users, { id: requesterId, role: UserRole.Admin }];
