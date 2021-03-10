@@ -6,3 +6,10 @@ node_modules/
 
 # vs code config
 /.vscode
+
+# coverage
+coverage/
+
+.env
+
+/data
