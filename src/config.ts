@@ -6,7 +6,7 @@ export default {
     environment: env.get('NODE_ENV').default('development').asString(),
   },
   mongo: {
-    uri: env.get('MONGO_URI').default('mongodb://localhost:27017/devDB').asUrlString(),
+    uri: env.get('MONGO_URI').default('mongodb://localhost:27017/devDB').asString(),
     featureCollectionName: env.get('MONGO_FEATURE_COLLECTION_NAME').default('groups').asString(),
   },
   apm: {
