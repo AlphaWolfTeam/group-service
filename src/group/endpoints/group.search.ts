@@ -24,6 +24,12 @@ export default class SearchGroup extends Endpoint {
     });
   }
 
+  private static escapeRegex(str: string): string {
+    if (typeof str !== 'string') return str; // TODO: Decide whether this throws an error or not
+
+    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  }
+
   async requestHandler(req: Request, res: Response): Promise<void> {
     const partial = req.query.partial;
     if (typeof(partial) !== 'string') throw new InvalidArgument('partial should be a string');
@@ -33,7 +39,7 @@ export default class SearchGroup extends Endpoint {
 
     const requesterID = req.header(config.userHeader);
 
-    const groups: IGroup[] = await SearchGroup.logic(partial, type, requesterID);
+    const groups: IGroup[] = await SearchGroup.logic(SearchGroup.escapeRegex(partial), type, requesterID);
     res.status(200).json(groups);
   }
 
