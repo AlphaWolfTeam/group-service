@@ -25,8 +25,6 @@ export default class SearchGroup extends Endpoint {
   }
 
   private static escapeRegex(str: string): string {
-    if (typeof str !== 'string') return str; // TODO: Decide whether this throws an error or not
-
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
